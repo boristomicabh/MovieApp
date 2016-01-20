@@ -1,0 +1,45 @@
+package com.atlantbh.boristomic.movieapplication.services;
+
+import com.atlantbh.boristomic.movieapplication.models.MoviesResponse;
+import com.atlantbh.boristomic.movieapplication.utils.Constants;
+
+import retrofit.Callback;
+import retrofit.http.GET;
+import retrofit.http.Query;
+
+/**
+ * Created by boristomic on 19/01/16.
+ */
+public interface MovieAPI {
+
+    /**
+     * Used to get most popular movies, by default it's sorted by popularity descending
+     *
+     * @param sortBy   <code>String</code> type value by which list of movies will be sorted, by default it's popularity in descending order
+     * @param callback <code>MoviesResponse</code> type value that is received from API, includes list of movies
+     */
+    @GET(Constants.URL_DISCOVER_MOVIE)
+    void listPopularMovies(@Query(Constants.QUERY_SORT_BY) String sortBy, Callback<MoviesResponse> callback);
+
+    /**
+     * Used to get best movies in given year, by default it's sorted by average vote in descending order
+     *
+     * @param year     <code>int</code> type value of year
+     * @param sortBy   <code>String</code> type value by which list of movies will be sorted, by default it's average vote in descending order
+     * @param callback <code>MoviesResponse</code> type value that is received from API, includes list of movies
+     */
+    @GET(Constants.URL_DISCOVER_MOVIE)
+    void listBestMoviesByYear(@Query(Constants.QUERY_PRIMARY_RELEASE_YEAR) int year, @Query(Constants.QUERY_SORT_BY) String sortBy, Callback<MoviesResponse> callback);
+
+    @GET(Constants.URL_TOP_RATED_MOVIES)
+    void listTopRatedMovies(Callback<MoviesResponse> callback);
+
+    @GET(Constants.URL_UPCOMING_MOVIES)
+    void listUpcomingMovies(Callback<MoviesResponse> callback);
+
+    @GET(Constants.URL_TOP_RATED_TV_SHOWS)
+    void listTopRatedTvShows(Callback<MoviesResponse> callback);
+
+    @GET(Constants.URL_DISCOVER_TV)
+    void listPopularTvShows(@Query(Constants.QUERY_SORT_BY) String sortBy, Callback<MoviesResponse> callback);
+}
