@@ -18,7 +18,7 @@ public class Movie {
     private String homepage;
     @SerializedName("id")
     @Expose
-    private int id;
+    private long id;
     @SerializedName("imdb_id")
     @Expose
     private String imdbId;
@@ -95,7 +95,7 @@ public class Movie {
         this.homepage = homepage;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

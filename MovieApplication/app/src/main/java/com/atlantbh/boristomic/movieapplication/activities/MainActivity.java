@@ -50,6 +50,8 @@ public class MainActivity extends Activity {
         populateUpcomingMovies();
         populateTopRatedTvShows();
         populatePopularTvShows();
+
+
     }
 
     private void populatePopularMovies() {

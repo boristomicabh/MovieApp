@@ -1,5 +1,10 @@
 package com.atlantbh.boristomic.movieapplication.utils;
 
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+
+import com.atlantbh.boristomic.movieapplication.R;
+import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
 
 import java.text.DateFormatSymbols;
@@ -13,6 +18,13 @@ public class MovieUtils {
 
     public static String getPosterURL(String size, Movie movie) {
         return Constants.URL_BASE_IMG + size + movie.getPosterPath();
+    }
+
+    public static String getBackdropURL(String size, Movie movie) {
+        if (movie.getBackdropPath() == null) {
+            return null;
+        }
+        return Constants.URL_BASE_IMG + size + movie.getBackdropPath();
     }
 
     public static String getMovieYear(Movie movie) {
@@ -52,24 +64,37 @@ public class MovieUtils {
 
     private static String getNumberFormattedString(int number) {
         switch (number) {
-            case 1: return "Next month";
-            case 2: return "In two months";
-            case 3: return "In three months";
-            case 4: return "In four months";
-            case 5: return "In five months";
-            case 6: return "In six months";
-            case 7: return "In seven months";
-            case 8: return "In eight months";
-            case 9: return "In nine months";
-            case 10: return "In ten months";
-            case 11: return "In eleven months";
-            case 12: return "In one year";
-            default: return null;
+            case 1:
+                return "Next month";
+            case 2:
+                return "In two months";
+            case 3:
+                return "In three months";
+            case 4:
+                return "In four months";
+            case 5:
+                return "In five months";
+            case 6:
+                return "In six months";
+            case 7:
+                return "In seven months";
+            case 8:
+                return "In eight months";
+            case 9:
+                return "In nine months";
+            case 10:
+                return "In ten months";
+            case 11:
+                return "In eleven months";
+            case 12:
+                return "In one year";
+            default:
+                return null;
         }
     }
 
     private static String ordinalSufix(int i) {
-        String[] sufixes = new String[] { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
+        String[] sufixes = new String[]{"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
         switch (i % 100) {
             case 11:
             case 12:
@@ -84,7 +109,7 @@ public class MovieUtils {
         String month = "wrong";
         DateFormatSymbols dfs = new DateFormatSymbols();
         String[] months = dfs.getMonths();
-        if (num >= 0 && num <= 11 ) {
+        if (num >= 0 && num <= 11) {
             month = months[num];
         }
         return month;

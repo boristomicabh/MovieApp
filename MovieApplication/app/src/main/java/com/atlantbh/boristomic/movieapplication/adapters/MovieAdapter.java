@@ -1,6 +1,8 @@
 package com.atlantbh.boristomic.movieapplication.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
+import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
@@ -87,8 +90,10 @@ public class MovieAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, String.valueOf(temp.getId()), Toast.LENGTH_SHORT).show();
-
+                Intent intent = new Intent(context, MovieActivity.class);
+                Bundle bundle = new Bundle();
+                intent.putExtra(Constants.INTENT_KEY, temp.getId());
+                context.startActivity(intent);
             }
         });
         return view;

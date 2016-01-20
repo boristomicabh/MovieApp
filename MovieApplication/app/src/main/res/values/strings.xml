@@ -6,5 +6,6 @@
     <string name="upcoming_movies_title" translatable="true">Upcoming Movies</string>
     <string name="top_rated_tvshows_title" translatable="true">Top Rated TV Shows</string>
     <string name="most_popular_tvshows_title" translatable="true">Most popular TV Shows</string>
-    
+    <string name="title_activity_movie">MovieActivity</string>
+
 </resources>

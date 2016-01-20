@@ -3,6 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="list_height_size">250dp</dimen>
+    <dimen name="list_height_size">245dp</dimen>
     <dimen name="line_start">10dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

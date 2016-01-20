@@ -1,10 +1,12 @@
 package com.atlantbh.boristomic.movieapplication.services;
 
+import com.atlantbh.boristomic.movieapplication.models.Movie;
 import com.atlantbh.boristomic.movieapplication.models.MoviesResponse;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 
 import retrofit.Callback;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -42,4 +44,7 @@ public interface MovieAPI {
 
     @GET(Constants.URL_DISCOVER_TV)
     void listPopularTvShows(@Query(Constants.QUERY_SORT_BY) String sortBy, Callback<MoviesResponse> callback);
+
+    @GET(Constants.URL_MOVIE_ID)
+    void findSingleMovie(@Path("id") long id, Callback<Movie> callback);
 }
