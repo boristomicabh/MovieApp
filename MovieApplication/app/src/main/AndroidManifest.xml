@@ -21,6 +21,7 @@
         </activity>
         <activity
             android:name=".activities.MovieActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_movie"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

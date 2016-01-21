@@ -66,6 +66,11 @@ public class Movie {
     @SerializedName("vote_count")
     @Expose
     private int voteCount;
+    @SerializedName("genres")
+    @Expose
+    private List<Genre> genres = new ArrayList<Genre>();
+
+    private boolean isFavourite;
 
     public Movie() {
 
@@ -229,6 +234,22 @@ public class Movie {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
+    public boolean isFavourite() {
+        return isFavourite;
+    }
+
+    public void setIsFavourite(boolean isFavourite) {
+        this.isFavourite = isFavourite;
     }
 
     @Override

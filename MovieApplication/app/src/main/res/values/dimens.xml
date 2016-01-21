@@ -6,4 +6,5 @@
     <dimen name="list_height_size">245dp</dimen>
     <dimen name="line_start">10dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="left_padding_movie_feed">5dp</dimen>
 </resources>

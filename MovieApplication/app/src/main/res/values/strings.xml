@@ -7,5 +7,9 @@
     <string name="top_rated_tvshows_title" translatable="true">Top Rated TV Shows</string>
     <string name="most_popular_tvshows_title" translatable="true">Most popular TV Shows</string>
     <string name="title_activity_movie">MovieActivity</string>
+    <string name="user_rating_title">Your\n\rRating</string>
+    <string name="user_rating_value">Not Yet Rated</string>
+    <string name="movie_cast">Cast</string>
+    <string name="movie_gallery_title">Gallery</string>
 
 </resources>

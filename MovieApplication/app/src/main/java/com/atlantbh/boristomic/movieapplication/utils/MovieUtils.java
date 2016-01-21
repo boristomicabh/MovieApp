@@ -5,7 +5,12 @@ import android.graphics.drawable.Drawable;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
+import com.atlantbh.boristomic.movieapplication.models.Backdrop;
+import com.atlantbh.boristomic.movieapplication.models.Cast;
+import com.atlantbh.boristomic.movieapplication.models.Genre;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
+import com.atlantbh.boristomic.movieapplication.models.Trailer;
+import com.atlantbh.boristomic.movieapplication.models.Videos;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -25,6 +30,18 @@ public class MovieUtils {
             return null;
         }
         return Constants.URL_BASE_IMG + size + movie.getBackdropPath();
+    }
+
+    public static String getCastImageURL(String size, Cast cast) {
+        return Constants.URL_BASE_IMG + size + cast.getProfilePath();
+    }
+
+    public static String getBackdropURLForGallery(String size, Backdrop backdrop) {
+        return Constants.URL_BASE_IMG + size + backdrop.getFilePath();
+    }
+
+    public static String getShorterOverview(Movie movie) {
+        return movie.getOverview().substring(0, 230) + "...";
     }
 
     public static String getMovieYear(Movie movie) {
@@ -52,6 +69,22 @@ public class MovieUtils {
         }
 
         return formattedDate;
+    }
+
+    public static String getTitleWithYear(Movie movie, int type) {
+        if (type == Constants.TV_SHOWS) {
+            return movie.getName() + " (" + getMovieYear(movie) + ")";
+        }
+        return movie.getTitle() + " (" + getMovieYear(movie) + ")";
+    }
+
+    public static String getMovieTrailer(Videos videos) {
+        for (Trailer t : videos.getResults()) {
+            if (Constants.YOUTUBE.equals(t.getSite())) {
+                return t.getKey();
+            }
+        }
+        return null;
     }
 
     private static String getThisMonthDate(int month, int day) {
@@ -115,4 +148,23 @@ public class MovieUtils {
         return month;
     }
 
+    public static String getDurationAndGenre(Movie movie) {
+        return getMovieTime(movie) + " | " + getGenreNames(movie);
+    }
+
+    private static String getGenreNames(Movie movie) {
+        StringBuilder builder = new StringBuilder();
+        for(Genre g : movie.getGenres()) {
+            builder.append(g.getName());
+            builder.append(" ");
+        }
+        return builder.toString();
+    }
+
+    private static String getMovieTime(Movie movie) {
+        int hours = movie.getRuntime() / 60;
+        int min = movie.getRuntime() - 60 * hours;
+
+        return hours + " h " + min + " m";
+    }
 }

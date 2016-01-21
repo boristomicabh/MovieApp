@@ -1,7 +1,11 @@
 package com.atlantbh.boristomic.movieapplication.services;
 
+import com.atlantbh.boristomic.movieapplication.models.Cast;
+import com.atlantbh.boristomic.movieapplication.models.Credits;
+import com.atlantbh.boristomic.movieapplication.models.Images;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
 import com.atlantbh.boristomic.movieapplication.models.MoviesResponse;
+import com.atlantbh.boristomic.movieapplication.models.Videos;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 
 import retrofit.Callback;
@@ -47,4 +51,18 @@ public interface MovieAPI {
 
     @GET(Constants.URL_MOVIE_ID)
     void findSingleMovie(@Path("id") long id, Callback<Movie> callback);
+
+    @GET(Constants.URL_TV_ID)
+    void findSingleTvShow(@Path("id") long id, Callback<Movie> callback);
+
+    @GET(Constants.URL_MOVIE_ID + "/credits")
+    void findMovieCast(@Path("id") long id, Callback<Credits> callback);
+
+    @GET(Constants.URL_MOVIE_ID + "/videos")
+    void findMovieVideo(@Path("id") long id, Callback<Videos> callback);
+
+    @GET(Constants.URL_MOVIE_ID + "/images")
+    void findMovieBackdrops(@Path("id") long id, Callback<Images> callback);
+
+
 }

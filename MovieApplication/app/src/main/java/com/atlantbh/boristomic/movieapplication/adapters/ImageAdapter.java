@@ -2,7 +2,6 @@ package com.atlantbh.boristomic.movieapplication.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,36 +12,37 @@ import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
+import com.atlantbh.boristomic.movieapplication.models.Backdrop;
+import com.atlantbh.boristomic.movieapplication.models.Cast;
+import com.atlantbh.boristomic.movieapplication.models.Credits;
+import com.atlantbh.boristomic.movieapplication.models.Images;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
-
 /**
- * Created by boristomic on 19/01/16.
+ * Created by boristomic on 21/01/16.
  */
-public class MovieAdapter extends BaseAdapter {
+public class ImageAdapter extends BaseAdapter {
 
-    private List<Movie> movies;
+    private List<Backdrop> backdrops;
     private int listType;
 
-    public MovieAdapter(List<Movie> movies, int listType) {
-        this.movies = movies;
+    public ImageAdapter(Images images, int listType) {
+        this.backdrops = images.getBackdrops();
         this.listType = listType;
     }
 
     @Override
     public int getCount() {
-        return movies.size();
+        return backdrops.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return movies.get(position);
+        return backdrops.get(position);
     }
 
     @Override
@@ -69,38 +69,38 @@ public class MovieAdapter extends BaseAdapter {
 
         final Context context = parent.getContext();
         final View view = getView(context, convertView, parent);
-        ButterKnife.bind(context, view);
+        //ButterKnife.bind(context, view);
 
-        final Movie temp = movies.get(position);
+        final Backdrop temp = backdrops.get(position);
 
-        final TextView mMovieTitle = (TextView) view.findViewById(R.id.list_movie_title);
-        if (listType == Constants.TV_SHOWS) {
-            mMovieTitle.setText(temp.getName());
-        } else {
-            mMovieTitle.setText(temp.getTitle());
-        }
+//        final TextView mMovieTitle = (TextView) view.findViewById(R.id.list_movie_title);
+//        if (listType == Constants.TV_SHOWS) {
+//            mMovieTitle.setText(temp.getName());
+//        } else {
+//            mMovieTitle.setText(temp.getName());
+//        }
         final ImageView mMoviePoster = (ImageView) view.findViewById(R.id.list_movie_poster);
-        Picasso.with(context).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, temp)).into(mMoviePoster);
-        final TextView mMovieYear = (TextView) view.findViewById(R.id.list_movie_year);
-        if (listType == Constants.UPCOMING_MOVIES) {
-            mMovieYear.setText(MovieUtils.getUpcomingMovieDate(temp));
-        } else {
-            mMovieYear.setText(MovieUtils.getMovieYear(temp));
-        }
+        Picasso.with(context).load(MovieUtils.getBackdropURLForGallery(Constants.BACKDROP_SIZE_W300, temp)).into(mMoviePoster);
+//        final TextView mMovieYear = (TextView) view.findViewById(R.id.list_movie_year);
+//        if (listType == Constants.UPCOMING_MOVIES) {
+//            mMovieYear.setText(MovieUtils.getUpcomingMovieDate(temp));
+//        } else {
+//            mMovieYear.setText(MovieUtils.getMovieYear(temp));
+//        }
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(context, temp.getVoteCount(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(context, MovieActivity.class);
-                Bundle bundle = new Bundle();
-                intent.putExtra(Constants.INTENT_KEY, temp.getId());
-                if (listType == Constants.TV_SHOWS) {
-                    intent.putExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, Constants.TV_SHOWS);
-                }
-                context.startActivity(intent);
+//                Bundle bundle = new Bundle();
+//                intent.putExtra(Constants.INTENT_KEY, temp.getId());
+//                if (listType == Constants.TV_SHOWS) {
+//                    intent.putExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, Constants.TV_SHOWS);
+//                }
+//                context.startActivity(intent);
             }
         });
         return view;
     }
-
 }

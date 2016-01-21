@@ -6,12 +6,14 @@ package com.atlantbh.boristomic.movieapplication.utils;
 public class Constants {
 
     public static final String URL_MOVIE_ID = "/movie/{id}";
+    public static final String URL_TV_ID = "/tv/{id}";
     public static final String URL_TV = "/tv";
     public static final String URL_DISCOVER_MOVIE = "/discover/movie";
     public static final String URL_DISCOVER_TV = "/discover/tv";
     public static final String URL_TOP_RATED_MOVIES = "/movie/top_rated";
     public static final String URL_UPCOMING_MOVIES = "/movie/upcoming";
     public static final String URL_TOP_RATED_TV_SHOWS = "/tv/top_rated";
+    public static final String URL_MOVIE_CREDITS = "/movie/{id}/credits";
 
     public static final String URL_BASE = "https://api.themoviedb.org/3";
     public static final String URL_BASE_IMG = "http://image.tmdb.org/t/p/";
@@ -31,11 +33,23 @@ public class Constants {
     public static final String BACKDROP_SIZE_W780 = "w780";
     public static final String BACKDROP_SIZE_W1280 = "w1280";
 
+    public static final String PROFILE_SIZE_W45 = "w45";
+    public static final String PROFILE_SIZE_W185 = "w185";
+    public static final String PROFILE_SIZE_W632 = "w632";
+
     public static final int OTHER_LISTS = 1;
     public static final int UPCOMING_MOVIES = 2;
     public static final int TV_SHOWS = 3;
+    public static final int MOVIE = 4;
 
     public static final String INTENT_KEY = "id";
+    public static final String INTENT_KEY_TYPE_TV_SHOW = "tvShow";
+    public static final String INTENT_KEY_TYPE_MOVIE = "movie";
+
+    public static final String YOUTUBE = "YouTube";
+    public static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+    public static final String MOVIE_REVIEW_URL_BASE = "https://www.themoviedb.org/movie/";
+    public static final String MOVIE_REVIEW_URL_EXTRA = "/reviews";
 
     // TODO move to property file
     public static final String API_KEY = "34aa7e1baaee7e047801a1a8454587b8";
