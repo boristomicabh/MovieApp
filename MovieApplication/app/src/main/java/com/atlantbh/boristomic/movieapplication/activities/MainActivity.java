@@ -3,7 +3,13 @@ package com.atlantbh.boristomic.movieapplication.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.BaseAdapter;
 
 import com.atlantbh.boristomic.movieapplication.R;
@@ -21,7 +27,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -47,6 +53,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         context = this;
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         api = RestService.get();
         populatePopularMovies();
@@ -54,6 +62,41 @@ public class MainActivity extends Activity {
         populateUpcomingMovies();
         populateTopRatedTvShows();
         populatePopularTvShows();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem searchItem = menu.findItem(R.id.search_movie);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextChange(String newText)
+            {
+                Log.i("onQueryTextChange", newText);
+
+                return true;
+            }
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                Log.i("onQueryTextSubmit", query);
+
+                return true;
+            }
+        };
+        searchView.setOnQueryTextListener(queryTextListener);
+
+
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void populatePopularMovies() {

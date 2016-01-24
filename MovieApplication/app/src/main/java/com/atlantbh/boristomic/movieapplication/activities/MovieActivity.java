@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -62,19 +64,22 @@ public class MovieActivity extends AppCompatActivity {
     @Bind(R.id.movie_reviews_link)
     ImageView movieReviewsLink;
 
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         api = RestService.get();
         ButterKnife.bind(MovieActivity.this);
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         final long movieId = intent.getLongExtra(Constants.INTENT_KEY, 1);
-        int tvShow = intent.getIntExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, -1);
+        final int tvShow = intent.getIntExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, -1);
 
         if (tvShow == -1) {
             showMovie(movieId);
@@ -84,6 +89,16 @@ public class MovieActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     private void showMovie(final long movieId) {
 
@@ -91,6 +106,9 @@ public class MovieActivity extends AppCompatActivity {
 
                     @Override
                     public void success(Movie movie, Response response) {
+
+                        toolbar.setTitle(movie.getTitle());
+
 
                         String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W1280, movie);
 
@@ -179,6 +197,8 @@ public class MovieActivity extends AppCompatActivity {
         api.findSingleTvShow(movieId, new Callback<Movie>() {
             @Override
             public void success(Movie movie, Response response) {
+
+                toolbar.setTitle(movie.getName());
 
                 String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W1280, movie);
 

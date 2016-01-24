@@ -3,7 +3,9 @@ package com.atlantbh.boristomic.movieapplication.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ public class ActorActivity extends AppCompatActivity {
 
     private final String LOG_TAG = ActorActivity.class.getSimpleName();
     private MovieAPI api;
+    private long movieId;
 
     @Bind(R.id.actor_first_image)
     ImageView actorFirstImage;
@@ -51,8 +54,10 @@ public class ActorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actor);
         ButterKnife.bind(this);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         api = RestService.get();
 
 //        Display display = getWindowManager().getDefaultDisplay();
@@ -65,9 +70,9 @@ public class ActorActivity extends AppCompatActivity {
 
 
 
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         long actorId = intent.getLongExtra(Constants.INTENT_KEY, -1);
+        movieId = intent.getLongExtra(Constants.INTENT_KEY_TYPE_MOVIE, -1);
 
         api.findActorImages(actorId, new Callback<ActorImages>() {
 
@@ -97,6 +102,7 @@ public class ActorActivity extends AppCompatActivity {
         api.findActor(actorId, new Callback<Actor>() {
             @Override
             public void success(Actor actor, Response response) {
+                toolbar.setTitle(actor.getName());
                 actorName.setText(actor.getName());
                 actorAgeLocation.setText(MovieUtils.getActorBirthData(actor));
                 Picasso.with(ActorActivity.this).load(Constants.URL_BASE_IMG + Constants.POSTER_SIZE_W342 + actor.getProfilePath()).into(actorPoster);
@@ -143,4 +149,14 @@ public class ActorActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+            finish();
+            return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 }

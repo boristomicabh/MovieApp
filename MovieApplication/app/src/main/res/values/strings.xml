@@ -1,16 +1,17 @@
 <resources>
     <string name="app_name">MovieApplication</string>
-
+    <string name="title_activity_main">Feed</string>
     <string name="most_popular_movies_title" translatable="true">Most Popular Movies</string>
     <string name="top_rated_movies_title" translatable="true">Top Rated Movies</string>
     <string name="upcoming_movies_title" translatable="true">Upcoming Movies</string>
     <string name="top_rated_tvshows_title" translatable="true">Top Rated TV Shows</string>
     <string name="most_popular_tvshows_title" translatable="true">Most popular TV Shows</string>
-    <string name="title_activity_movie">MovieActivity</string>
+    <string name="title_activity_movie"></string>
     <string name="user_rating_title">Your\n\rRating</string>
     <string name="user_rating_value">Not Yet Rated</string>
     <string name="movie_cast">Cast</string>
     <string name="movie_gallery_title">Gallery</string>
-    <string name="title_activity_actor">ActorActivity</string>
+    <string name="title_activity_actor"></string>
+    <string name="search_title">Search</string>
 
 </resources>
