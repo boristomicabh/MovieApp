@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.ActorActivity">
+
+    <!-- TOOLBAR EXAMPLE
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+-->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/actor_first_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside" />
+
+            <TextView
+                android:id="@+id/actor_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/actor_first_image"
+                android:paddingLeft="@dimen/left_padding_movie_feed"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/actor_year_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/actor_name"
+                android:paddingLeft="@dimen/left_padding_movie_feed"/>
+
+
+            <ImageView
+                android:id="@+id/actor_poster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/actor_year_location"
+                android:paddingLeft="@dimen/left_padding_movie_feed" />
+
+            <TextView
+                android:id="@+id/actor_biography"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/actor_year_location"
+                android:layout_toEndOf="@id/actor_poster"
+                android:padding="5dp"
+                android:layout_alignTop="@id/actor_poster"
+                android:layout_alignBottom="@id/actor_poster"/>
+
+            <View
+                android:id="@+id/line_bio"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/actor_biography"
+                android:layout_margin="5dp"
+                android:layout_marginStart="@dimen/line_start"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/appeared_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/line_bio"
+                android:paddingLeft="@dimen/left_padding_movie_feed"
+                android:textStyle="bold"
+                android:text="Actor Appeared In"/>
+
+            <TextView
+                android:id="@+id/actor_movies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/appeared_in"
+                android:paddingLeft="@dimen/left_padding_movie_feed"
+                android:text="Movies"/>
+
+            <mobi.parchment.widget.adapterview.listview.ListView xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
+                android:id="@+id/actor_movies_list"
+                android:layout_width="wrap_content"
+                android:layout_height="160dp"
+                android:layout_below="@id/actor_movies"
+                android:clipToPadding="false"
+                android:scrollbarAlwaysDrawHorizontalTrack="true"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="horizontal"
+                parchment:cellSpacing="5dp"
+                parchment:orientation="horizontal"
+                parchment:snapPosition="start"
+                parchment:snapToPosition="true"/>
+
+
+
+            <TextView
+                android:id="@+id/actor_tvshows"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/actor_movies_list"
+                android:paddingLeft="@dimen/left_padding_movie_feed"
+                android:text="TV Shows"/>
+
+            <mobi.parchment.widget.adapterview.listview.ListView xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
+                android:id="@+id/actor_tv_shows_list"
+                android:layout_width="wrap_content"
+                android:layout_height="160dp"
+                android:layout_below="@id/actor_tvshows"
+                android:clipToPadding="false"
+                android:scrollbarAlwaysDrawHorizontalTrack="true"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="horizontal"
+                parchment:cellSpacing="5dp"
+                parchment:orientation="horizontal"
+                parchment:snapPosition="start"
+                parchment:snapToPosition="true" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</FrameLayout>

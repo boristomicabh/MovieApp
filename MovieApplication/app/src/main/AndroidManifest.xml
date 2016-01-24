@@ -23,7 +23,16 @@
             android:name=".activities.MovieActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_movie"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ActorActivity"
+            android:label="@string/title_activity_actor"
+            android:parentActivityName=".activities.MovieActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.atlantbh.boristomic.movieapplication.activities.MovieActivity" />
+        </activity>
     </application>
 
 </manifest>

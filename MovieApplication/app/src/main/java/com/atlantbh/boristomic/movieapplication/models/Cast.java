@@ -21,7 +21,7 @@ public class Cast {
     private String creditId;
     @SerializedName("id")
     @Expose
-    private int id;
+    private long id;
     @SerializedName("name")
     @Expose
     private String name;
@@ -31,6 +31,15 @@ public class Cast {
     @SerializedName("profile_path")
     @Expose
     private Object profilePath;
+    @SerializedName("original_title")
+    @Expose
+    private String originalTitle;
+    @SerializedName("original_name")
+    @Expose
+    private String originalName;
+    @SerializedName("poster_path")
+    @Expose
+    private String posterPath;
 
     /**
      *
@@ -91,7 +100,7 @@ public class Cast {
      * @return
      * The id
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -100,7 +109,7 @@ public class Cast {
      * @param id
      * The id
      */
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -158,4 +167,47 @@ public class Cast {
         this.profilePath = profilePath;
     }
 
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
+    }
+
+    /**
+     *  @return
+     *  The posterPath
+    */
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    /**
+     *
+     * @param posterPath
+     * The poster_path
+     */
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
+
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    @Override
+    public String toString() {
+        return "Cast{" +
+                "castId=" + castId +
+                ", character='" + character + '\'' +
+                ", creditId='" + creditId + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", order=" + order +
+                ", profilePath=" + profilePath +
+                ", originalTitle='" + originalTitle + '\'' +
+                ", posterPath='" + posterPath + '\'' +
+                '}';
+    }
 }

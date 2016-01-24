@@ -1,5 +1,7 @@
 package com.atlantbh.boristomic.movieapplication.services;
 
+import com.atlantbh.boristomic.movieapplication.models.Actor;
+import com.atlantbh.boristomic.movieapplication.models.ActorImages;
 import com.atlantbh.boristomic.movieapplication.models.Cast;
 import com.atlantbh.boristomic.movieapplication.models.Credits;
 import com.atlantbh.boristomic.movieapplication.models.Images;
@@ -58,11 +60,34 @@ public interface MovieAPI {
     @GET(Constants.URL_MOVIE_ID + "/credits")
     void findMovieCast(@Path("id") long id, Callback<Credits> callback);
 
+    @GET(Constants.URL_TV_ID + "/credits")
+    void findTvShowCast(@Path("id") long id, Callback<Credits> callback);
+
     @GET(Constants.URL_MOVIE_ID + "/videos")
     void findMovieVideo(@Path("id") long id, Callback<Videos> callback);
 
+    @GET(Constants.URL_TV_ID + "/videos")
+    void findTvShowVideo(@Path("id") long id, Callback<Videos> callback);
+
     @GET(Constants.URL_MOVIE_ID + "/images")
     void findMovieBackdrops(@Path("id") long id, Callback<Images> callback);
+
+    @GET(Constants.URL_TV_ID + "/images")
+    void findTvShowBackdrops(@Path("id") long id, Callback<Images> callback);
+
+    @GET(Constants.URL_ACTOR_ID)
+    void findActor(@Path("id") long id, Callback<Actor> callback);
+
+    @GET(Constants.URL_ACTOR_ID + "/tagged_images")
+    void findActorImages(@Path("id") long id, Callback<ActorImages> callback);
+
+    @GET(Constants.URL_ACTOR_ID + "/movie_credits")
+    void findActorMovies(@Path("id") long id, Callback<Credits> callback);
+
+    @GET(Constants.URL_ACTOR_ID + "/tv_credits")
+    void findActorTVShows(@Path("id") long id, Callback<Credits> callback);
+
+
 
 
 }

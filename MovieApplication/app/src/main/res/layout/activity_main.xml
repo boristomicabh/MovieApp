@@ -28,11 +28,11 @@
                 android:layout_below="@id/most_popular_movies_title"
                 android:clipToPadding="false"
                 android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarStyle="insideInset"
                 android:scrollbars="horizontal"
                 parchment:cellSpacing="5sp"
                 parchment:orientation="horizontal"
-                parchment:snapPosition="start"
+                parchment:snapPosition="onScreen"
                 parchment:snapToPosition="true" />
 
             <View
@@ -60,11 +60,11 @@
                 android:layout_below="@id/top_rated_movies_title"
                 android:clipToPadding="false"
                 android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarStyle="insideInset"
                 android:scrollbars="horizontal"
                 parchment:cellSpacing="5dp"
                 parchment:orientation="horizontal"
-                parchment:snapPosition="start"
+                parchment:snapPosition="onScreen"
                 parchment:snapToPosition="true" />
 
             <View
@@ -92,11 +92,11 @@
                 android:layout_below="@id/upcoming_movies_title"
                 android:clipToPadding="false"
                 android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarStyle="insideInset"
                 android:scrollbars="horizontal"
                 parchment:cellSpacing="5dp"
                 parchment:orientation="horizontal"
-                parchment:snapPosition="start"
+                parchment:snapPosition="onScreen"
                 parchment:snapToPosition="true" />
 
             <View
@@ -123,11 +123,11 @@
                 android:layout_below="@id/top_rated_tvshows_title"
                 android:clipToPadding="false"
                 android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarStyle="insideInset"
                 android:scrollbars="horizontal"
                 parchment:cellSpacing="5dp"
                 parchment:orientation="horizontal"
-                parchment:snapPosition="start"
+                parchment:snapPosition="onScreen"
                 parchment:snapToPosition="true" />
 
             <View
@@ -149,18 +149,19 @@
                 android:textStyle="bold" />
 
 
-            <mobi.parchment.widget.adapterview.listview.ListView xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
+            <mobi.parchment.widget.adapterview.listview.ListView
+                xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
                 android:id="@+id/most_popular_tvshows_list"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/list_height_size"
                 android:layout_below="@id/most_popular_tvshows_title"
                 android:clipToPadding="false"
                 android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarStyle="insideInset"
                 android:scrollbars="horizontal"
                 parchment:cellSpacing="5dp"
                 parchment:orientation="horizontal"
-                parchment:snapPosition="start"
+                parchment:snapPosition="onScreen"
                 parchment:snapToPosition="true" />
 
 

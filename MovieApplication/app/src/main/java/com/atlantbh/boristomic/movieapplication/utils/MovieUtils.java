@@ -2,9 +2,11 @@ package com.atlantbh.boristomic.movieapplication.utils;
 
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
+import com.atlantbh.boristomic.movieapplication.models.Actor;
 import com.atlantbh.boristomic.movieapplication.models.Backdrop;
 import com.atlantbh.boristomic.movieapplication.models.Cast;
 import com.atlantbh.boristomic.movieapplication.models.Genre;
@@ -33,6 +35,9 @@ public class MovieUtils {
     }
 
     public static String getCastImageURL(String size, Cast cast) {
+        if (cast.getProfilePath() == null) {
+            return Constants.URL_BASE_IMG + size + cast.getPosterPath();
+        }
         return Constants.URL_BASE_IMG + size + cast.getProfilePath();
     }
 
@@ -56,7 +61,6 @@ public class MovieUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(current);
         int currentMonth = calendar.get(Calendar.MONTH);
-
         int movieMonth = Integer.parseInt(movie.getReleaseDate().split("-")[1]);
         int movieDay = Integer.parseInt(movie.getReleaseDate().split("-")[2]);
 
@@ -65,7 +69,7 @@ public class MovieUtils {
         String formattedDate = getNumberFormattedString(result);
 
         if (formattedDate == null) {
-            return getThisMonthDate(movieMonth, movieDay);
+            return getThisMonthDate(currentMonth, movieDay);
         }
 
         return formattedDate;
@@ -141,7 +145,7 @@ public class MovieUtils {
     private static String getMonthForInt(int num) {
         String month = "wrong";
         DateFormatSymbols dfs = new DateFormatSymbols();
-        String[] months = dfs.getMonths();
+        String[] months = dfs.getShortMonths();
         if (num >= 0 && num <= 11) {
             month = months[num];
         }
@@ -162,9 +166,23 @@ public class MovieUtils {
     }
 
     private static String getMovieTime(Movie movie) {
-        int hours = movie.getRuntime() / 60;
-        int min = movie.getRuntime() - 60 * hours;
+        if (movie.getRuntime() != 0) {
+            int hours = movie.getRuntime() / 60;
+            int min = movie.getRuntime() - 60 * hours;
 
-        return hours + " h " + min + " m";
+            return hours + " h " + min + " m";
+        }
+        StringBuilder mins = new StringBuilder();
+        for (int n : movie.getEpisodeRuntime()) {
+            mins.append(n);
+            mins.append(" m ");
+        }
+        return mins.toString();
     }
+
+    public static String getActorBirthData(Actor actor) {
+        return "Born " + actor.getBirthday() + " in " + actor.getPlaceOfBirth();
+    }
+
+
 }

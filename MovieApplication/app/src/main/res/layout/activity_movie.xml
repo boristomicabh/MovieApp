@@ -16,7 +16,8 @@
             <ImageView
                 android:id="@+id/backdrop_movie_image"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside" />
 
             <Button
                 android:id="@+id/favourite_icon"
@@ -233,7 +234,7 @@
                 android:layout_below="@id/movie_cast_title"
                 android:clipToPadding="false"
                 android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarStyle="insideInset"
                 android:scrollbars="horizontal"
                 parchment:cellSpacing="5dp"
                 parchment:orientation="horizontal"
@@ -249,14 +250,15 @@
                 android:text="@string/movie_gallery_title"
                 android:textStyle="bold" />
 
-            <mobi.parchment.widget.adapterview.listview.ListView xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
+            <mobi.parchment.widget.adapterview.listview.ListView
+                xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
                 android:id="@+id/movie_backdrop_list"
                 android:layout_width="wrap_content"
                 android:layout_height="100dp"
                 android:layout_below="@id/movie_gallery_title"
                 android:clipToPadding="false"
                 android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarStyle="insideInset"
                 android:scrollbars="horizontal"
                 parchment:cellSpacing="5dp"
                 parchment:orientation="horizontal"

@@ -99,6 +99,7 @@ public class MoviesResponse {
         this.totalPages = totalPages;
     }
 
+
     @Override
     public String toString() {
         return "MoviesResponse{" +

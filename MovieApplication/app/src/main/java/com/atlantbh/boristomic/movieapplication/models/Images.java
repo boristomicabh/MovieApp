@@ -13,17 +13,21 @@ public class Images {
 
     @SerializedName("id")
     @Expose
-    private int id;
+    private long id;
     @SerializedName("backdrops")
     @Expose
     private List<Backdrop> backdrops = new ArrayList<Backdrop>();
+    @SerializedName("profiles")
+    @Expose
+    private List<Backdrop> profiles = new ArrayList<Backdrop>();
+
 
     /**
      *
      * @return
      * The id
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -32,7 +36,7 @@ public class Images {
      * @param id
      * The id
      */
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -54,4 +58,7 @@ public class Images {
         this.backdrops = backdrops;
     }
 
+    public List<Backdrop> getProfiles() {
+        return profiles;
+    }
 }

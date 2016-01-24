@@ -1,6 +1,7 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.BaseAdapter;
@@ -24,6 +25,8 @@ public class MainActivity extends Activity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private static Context context;
+
     private List<Movie> popularMovies = null;
     private List<Movie> topRatedMovies = null;
     private List<Movie> upcomingMovies = null;
@@ -42,6 +45,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
         setContentView(R.layout.activity_main);
 
         api = RestService.get();
@@ -50,8 +54,6 @@ public class MainActivity extends Activity {
         populateUpcomingMovies();
         populateTopRatedTvShows();
         populatePopularTvShows();
-
-
     }
 
     private void populatePopularMovies() {
@@ -60,7 +62,7 @@ public class MainActivity extends Activity {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
                 popularMovies = moviesResponse.getResults();
-                popularMoviesAdapter = new MovieAdapter(popularMovies, Constants.OTHER_LISTS);
+                popularMoviesAdapter = new MovieAdapter(popularMovies, null, null, Constants.OTHER_LISTS);
 
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.most_popular_movies_list);
                 horizontalListView.setAdapter(popularMoviesAdapter);
@@ -79,7 +81,7 @@ public class MainActivity extends Activity {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
                 topRatedMovies = moviesResponse.getResults();
-                topRatedMoviesAdapter = new MovieAdapter(topRatedMovies, Constants.OTHER_LISTS);
+                topRatedMoviesAdapter = new MovieAdapter(topRatedMovies, null, null, Constants.OTHER_LISTS);
 
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.top_rated_movies_list);
                 horizontalListView.setAdapter(topRatedMoviesAdapter);
@@ -97,7 +99,7 @@ public class MainActivity extends Activity {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
                 upcomingMovies = moviesResponse.getResults();
-                upcomingMoviesAdapter = new MovieAdapter(upcomingMovies, Constants.UPCOMING_MOVIES);
+                upcomingMoviesAdapter = new MovieAdapter(upcomingMovies, null, null, Constants.UPCOMING_MOVIES);
 
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.upcoming_movies_list);
                 horizontalListView.setAdapter(upcomingMoviesAdapter);
@@ -115,7 +117,7 @@ public class MainActivity extends Activity {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
                 topRatedTvShows = moviesResponse.getResults();
-                topRatedTvShowsAdapter = new MovieAdapter(topRatedTvShows, Constants.TV_SHOWS);
+                topRatedTvShowsAdapter = new MovieAdapter(topRatedTvShows, null, null, Constants.TV_SHOWS);
 
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.top_rated_tvshows_list);
                 horizontalListView.setAdapter(topRatedTvShowsAdapter);
@@ -134,7 +136,7 @@ public class MainActivity extends Activity {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
                 popularTvShows = moviesResponse.getResults();
-                popularTvShowsAdapter = new MovieAdapter(popularTvShows, Constants.TV_SHOWS);
+                popularTvShowsAdapter = new MovieAdapter(popularTvShows, null, null, Constants.TV_SHOWS);
 
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.most_popular_tvshows_list);
                 horizontalListView.setAdapter(popularTvShowsAdapter);
@@ -148,6 +150,9 @@ public class MainActivity extends Activity {
 
     }
 
+    public static Context getContext() {
+        return context;
+    }
 
 
 }

@@ -11,5 +11,6 @@
     <string name="user_rating_value">Not Yet Rated</string>
     <string name="movie_cast">Cast</string>
     <string name="movie_gallery_title">Gallery</string>
+    <string name="title_activity_actor">ActorActivity</string>
 
 </resources>

@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-      />
+        />
 
     <TextView
         android:id="@+id/list_movie_title"

@@ -1,12 +1,27 @@
 package com.atlantbh.boristomic.movieapplication.utils;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
+import com.atlantbh.boristomic.movieapplication.activities.MainActivity;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Created by boristomic on 19/01/16.
  */
 public class Constants {
 
+    private static final String LOG_TAG = Constants.class.getSimpleName();
+
+    public final static String API_KEY = getStringFromFile("api.key");
+
     public static final String URL_MOVIE_ID = "/movie/{id}";
     public static final String URL_TV_ID = "/tv/{id}";
+    public static final String URL_ACTOR_ID = "/person/{id}";
     public static final String URL_TV = "/tv";
     public static final String URL_DISCOVER_MOVIE = "/discover/movie";
     public static final String URL_DISCOVER_TV = "/discover/tv";
@@ -35,12 +50,16 @@ public class Constants {
 
     public static final String PROFILE_SIZE_W45 = "w45";
     public static final String PROFILE_SIZE_W185 = "w185";
-    public static final String PROFILE_SIZE_W632 = "w632";
+    public static final String PROFILE_SIZE_H632 = "h632";
 
     public static final int OTHER_LISTS = 1;
     public static final int UPCOMING_MOVIES = 2;
     public static final int TV_SHOWS = 3;
     public static final int MOVIE = 4;
+    public static final int IMAGE = 5;
+    public static final int CAST = 6;
+    public static final int ACTOR_MOVIES = 7;
+    public static final int ACTOR_TV_SHOWS = 8;
 
     public static final String INTENT_KEY = "id";
     public static final String INTENT_KEY_TYPE_TV_SHOW = "tvShow";
@@ -50,9 +69,28 @@ public class Constants {
     public static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
     public static final String MOVIE_REVIEW_URL_BASE = "https://www.themoviedb.org/movie/";
     public static final String MOVIE_REVIEW_URL_EXTRA = "/reviews";
+    public static final String TV_SHOW_INFO_URL_BASE = "https://www.themoviedb.org/tv/";
 
-    // TODO move to property file
-    public static final String API_KEY = "34aa7e1baaee7e047801a1a8454587b8";
-
+    private static String getStringFromFile(String s) {
+        Context context = MainActivity.getContext();
+        AssetManager assetManager = context.getAssets();
+        Properties properties = new Properties();
+        InputStream is = null;
+        try {
+            is = assetManager.open("config.properties");
+            properties.load(is);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Unable to load config.properties", e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Failed to close input stream", e);
+                }
+            }
+        }
+        return properties.getProperty(s);
+    }
 
 }

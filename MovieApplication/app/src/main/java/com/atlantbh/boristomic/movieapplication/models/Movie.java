@@ -52,6 +52,9 @@ public class Movie {
     @SerializedName("runtime")
     @Expose
     private int runtime;
+    @SerializedName("episode_run_time")
+    @Expose
+    private List<Integer> episodeRuntime = new ArrayList<Integer>();
     @Expose
     private String status;
     @SerializedName("tagline")
@@ -250,6 +253,10 @@ public class Movie {
 
     public void setIsFavourite(boolean isFavourite) {
         this.isFavourite = isFavourite;
+    }
+
+    public List<Integer> getEpisodeRuntime() {
+        return episodeRuntime;
     }
 
     @Override

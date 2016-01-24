@@ -1,15 +1,9 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.BaseAdapter;
@@ -20,10 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.adapters.CreditsAdapter;
-import com.atlantbh.boristomic.movieapplication.adapters.ImageAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.MovieAdapter;
-import com.atlantbh.boristomic.movieapplication.models.Cast;
+import com.atlantbh.boristomic.movieapplication.listeners.MovieReviewClicked;
+import com.atlantbh.boristomic.movieapplication.listeners.MovieVideosClicked;
 import com.atlantbh.boristomic.movieapplication.models.Credits;
 import com.atlantbh.boristomic.movieapplication.models.Images;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
@@ -33,8 +26,6 @@ import com.atlantbh.boristomic.movieapplication.services.RestService;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -46,7 +37,7 @@ import retrofit.client.Response;
 public class MovieActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
-    MovieAPI api;
+    private MovieAPI api;
 
     @Bind(R.id.backdrop_movie_image)
     ImageView movieBackdrop;
@@ -78,14 +69,11 @@ public class MovieActivity extends AppCompatActivity {
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 
-
         api = RestService.get();
         ButterKnife.bind(MovieActivity.this);
 
-
-        //final ImageView movieBackdrop = (ImageView) this.findViewById(R.id.backdrop_movie_image);
         Intent intent = getIntent();
-        long movieId = intent.getLongExtra(Constants.INTENT_KEY, 1);
+        final long movieId = intent.getLongExtra(Constants.INTENT_KEY, 1);
         int tvShow = intent.getIntExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, -1);
 
         if (tvShow == -1) {
@@ -93,7 +81,6 @@ public class MovieActivity extends AppCompatActivity {
         } else {
             showTVShow(movieId);
         }
-
 
     }
 
@@ -128,35 +115,14 @@ public class MovieActivity extends AppCompatActivity {
                         movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
                         movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
                         movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
-
-                        movieReviewsLink.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.MOVIE_REVIEW_URL_BASE + movieId + Constants.MOVIE_REVIEW_URL_EXTRA)));
-                            }
-                        });
+                        movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
 
                         api.findMovieVideo(movieId, new Callback<Videos>() {
 
                             @Override
                             public void success(Videos videos, Response response) {
                                 final String trailerKey = MovieUtils.getMovieTrailer(videos);
-                                if (trailerKey == null) {
-                                    movieVideo.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Toast.makeText(MovieActivity.this, "No YouTube trailer for this movie", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                } else {
-                                    movieVideo.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.YOUTUBE_BASE_URL + trailerKey)));
-                                        }
-                                    });
-                                }
-
+                                movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
                             }
 
                             @Override
@@ -179,7 +145,7 @@ public class MovieActivity extends AppCompatActivity {
         api.findMovieCast(movieId, new Callback<Credits>() {
             @Override
             public void success(Credits credits, Response response) {
-                CreditsAdapter creditsAdapter = new CreditsAdapter(credits, 1);
+                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.CAST);
 
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
                 horizontalListView.setAdapter(creditsAdapter);
@@ -195,24 +161,25 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Images images, Response response) {
-                ImageAdapter imageAdapter = new ImageAdapter(images, 1);
+                MovieAdapter imageAdapter = new MovieAdapter(null, images, null, Constants.IMAGE);
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
                 horizontalListView.setAdapter(imageAdapter);
             }
 
             @Override
             public void failure(RetrofitError error) {
-
+                Log.e(LOG_TAG, "Failed to load movie backdrops", error);
             }
         });
 
 
     }
 
-    private void showTVShow(long movieId) {
+    private void showTVShow(final long movieId) {
         api.findSingleTvShow(movieId, new Callback<Movie>() {
             @Override
             public void success(Movie movie, Response response) {
+
                 String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W1280, movie);
 
                 if (backdropPath == null) {
@@ -220,13 +187,77 @@ public class MovieActivity extends AppCompatActivity {
                 } else {
                     Picasso.with(MovieActivity.this).load(backdropPath).into(movieBackdrop);
                 }
+
+                if (movie.isFavourite()) {
+                    favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+                }
+
                 movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.TV_SHOWS));
+                movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
+                Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(moviePoster);
+                if (movie.getOverview().length() > 250) {
+                    movieOverview.setText(MovieUtils.getShorterOverview(movie));
+                } else {
+                    movieOverview.setText(movie.getOverview());
+                }
+                movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
+                movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
+                movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
+
+                movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
+
+                api.findTvShowVideo(movieId, new Callback<Videos>() {
+
+                    @Override
+                    public void success(Videos videos, Response response) {
+                        final String trailerKey = MovieUtils.getMovieTrailer(videos);
+                        movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Log.e(LOG_TAG, "Failed to load tv show video", error);
+                    }
+                });
+
 
             }
 
             @Override
             public void failure(RetrofitError error) {
                 Log.e(LOG_TAG, "Failed to load single tv show", error);
+            }
+        });
+
+
+        api.findTvShowCast(movieId, new Callback<Credits>() {
+            @Override
+            public void success(Credits credits, Response response) {
+                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.CAST);
+
+                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
+                horizontalListView.setAdapter(creditsAdapter);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(LOG_TAG, "Failed to load tv show credits", error);
+            }
+        });
+
+        api.findTvShowBackdrops(movieId, new Callback<Images>() {
+
+            @Override
+            public void success(Images images, Response response) {
+                MovieAdapter imageAdapter = new MovieAdapter(null, images, null, Constants.IMAGE);
+                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
+                horizontalListView.setAdapter(imageAdapter);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(LOG_TAG, "Failed to load tv show backdrops", error);
+
             }
         });
     }
