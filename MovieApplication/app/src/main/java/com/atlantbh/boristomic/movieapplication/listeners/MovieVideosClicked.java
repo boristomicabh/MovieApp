@@ -21,6 +21,12 @@ public class MovieVideosClicked implements View.OnClickListener {
         this.context = context;
     }
 
+    /**
+     * New activity is started, browser opens movie trailer or tv show trailer on youtube,
+     * or toast is shown if no youtube trailer is found
+     *
+     * @param v <code>View</code> right arrow icon next to videos title
+     */
     @Override
     public void onClick(View v) {
         if (trailerKey == null) {

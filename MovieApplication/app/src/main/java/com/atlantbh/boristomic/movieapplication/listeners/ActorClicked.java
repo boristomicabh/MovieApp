@@ -21,6 +21,11 @@ public class ActorClicked implements View.OnClickListener {
         this.context = context;
     }
 
+    /**
+     * Actor activity is started and actor id is passed as parameter
+     *
+     * @param v <code>View</code> with cast image and name
+     */
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(context, ActorActivity.class);

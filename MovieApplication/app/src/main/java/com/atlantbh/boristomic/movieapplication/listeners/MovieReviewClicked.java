@@ -22,6 +22,11 @@ public class MovieReviewClicked implements View.OnClickListener {
         this.movieType = movieType;
     }
 
+    /**
+     * New activity is started, browser opens movie review page or tv show info page
+     *
+     * @param v <code>View</code> with info icon
+     */
     @Override
     public void onClick(View v) {
         if (Constants.MOVIE == movieType) {

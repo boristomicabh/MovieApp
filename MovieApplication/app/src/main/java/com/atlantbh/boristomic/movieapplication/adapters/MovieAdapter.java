@@ -41,13 +41,7 @@ public class MovieAdapter extends BaseAdapter {
     private int listType;
 
     public MovieAdapter(List<Movie> movies, Images images, Credits credits, int listType) {
-        if (movies != null) {
-            if (movies.size() > 10) {
-                this.movies = movies.subList(0, 10);
-            } else {
-                this.movies = movies;
-            }
-        }
+        this.movies = movies;
         if (images != null) {
             if (images.getBackdrops() == null) {
                 if (images.getProfiles().size() > 10) {
@@ -64,8 +58,8 @@ public class MovieAdapter extends BaseAdapter {
             }
         }
         if (credits != null) {
-            if (credits.getCast().size() > 8) {
-                this.cast = credits.getCast().subList(0, 8);
+            if (credits.getCast().size() > 10) {
+                this.cast = credits.getCast().subList(0, 10);
             } else {
                 this.cast = credits.getCast();
             }
@@ -103,7 +97,7 @@ public class MovieAdapter extends BaseAdapter {
         return true;
     }
 
-    private View getView(final Context context, final View convertView, final ViewGroup viewGroup) {
+    private View initConverView(final Context context, final View convertView, final ViewGroup viewGroup) {
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(context);
             final View view = layoutInflater.inflate(R.layout.movie_list_view, viewGroup, false);
@@ -116,7 +110,7 @@ public class MovieAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         final Context context = parent.getContext();
-        final View view = getView(context, convertView, parent);
+        final View view = initConverView(context, convertView, parent);
         final TextView mMovieTitle = (TextView) view.findViewById(R.id.list_movie_title);
         final ImageView mMoviePoster = (ImageView) view.findViewById(R.id.list_movie_poster);
         final TextView mMovieYear = (TextView) view.findViewById(R.id.list_movie_year);
@@ -129,7 +123,7 @@ public class MovieAdapter extends BaseAdapter {
             } else {
                 mMovieTitle.setText(temp.getTitle());
             }
-            Picasso.with(context).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, temp)).resize(342, 513).into(mMoviePoster);
+            Picasso.with(context).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W185, temp)).resize(342, 513).into(mMoviePoster);
             if (listType == Constants.UPCOMING_MOVIES) {
                 mMovieYear.setText(MovieUtils.getUpcomingMovieDate(temp));
             } else {
@@ -142,7 +136,7 @@ public class MovieAdapter extends BaseAdapter {
         // Show images in list view
         if (Constants.IMAGE == listType) {
             final Backdrop temp = backdrops.get(position);
-            if(temp.getWidth() > temp.getHeight()) {
+            if (temp.getWidth() > temp.getHeight()) {
                 Picasso.with(context).load(MovieUtils.getBackdropURLForGallery(Constants.BACKDROP_SIZE_W300, temp)).into(mMoviePoster);
             }
             // TODO add pager for gallery
@@ -155,7 +149,7 @@ public class MovieAdapter extends BaseAdapter {
 
         // Show list of actor movies and tv shows
         if (Constants.ACTOR_MOVIES == listType || Constants.ACTOR_TV_SHOWS == listType) {
-            Picasso.with(context).load(MovieUtils.getCastImageURL(Constants.POSTER_SIZE_W185, temp)).resize(185, 262).into(mMoviePoster);
+            Picasso.with(context).load(MovieUtils.getCastImageURL(Constants.POSTER_SIZE_W154, temp)).resize(185, 262).into(mMoviePoster);
             if (Constants.ACTOR_MOVIES == listType) {
                 mMovieTitle.setText(temp.getOriginalTitle());
             } else {

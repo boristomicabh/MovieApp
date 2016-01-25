@@ -47,51 +47,90 @@ public class ActorActivity extends AppCompatActivity {
     ImageView actorPoster;
     @Bind(R.id.actor_biography)
     TextView actorBiography;
+    private Toolbar toolbar;
 
+    /**
+     * Sets layout activity_actor.xml, adds toolbar with up button action.
+     * Then gets API connection and actor id from intent on witch the search will be executed.
+     * Searches for actor images, specifically images where actor was tagged and uses only first landscape image.
+     * Searches for actor and setups basic information about him/her.
+     * Searches for movies were actor appeared and shows them in a list,
+     * then searches for tv shows where actor appeared and also shows them in a list.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actor);
         ButterKnife.bind(this);
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         api = RestService.get();
 
-//        Display display = getWindowManager().getDefaultDisplay();
-//        Point size = new Point();
-//        display.getSize(size);
-//        int width = size.x;
-//        int height = size.y;
-//
-//        Log.v("VELICINA EKRANA", "sirina: " + String.valueOf(width) + " visina: " + String.valueOf(height));
-
-
         final Intent intent = getIntent();
         long actorId = intent.getLongExtra(Constants.INTENT_KEY, -1);
 
-        api.findActorImages(actorId, new Callback<ActorImages>() {
+        populateActorBackdropImage(actorId);
+        populateActorData(actorId);
+        populateActorMovies(actorId);
+        populateActorTvShows(actorId);
+    }
 
+    /**
+     * Calls api method that finds all tv shows for given actor id, and then sets shows into a list
+     *
+     * @param actorId <code>long</code> type value of actor id
+     */
+    private void populateActorTvShows(long actorId) {
+
+        api.findActorTVShows(actorId, new Callback<Credits>() {
             @Override
-            public void success(ActorImages actorImages, Response response) {
-                List<Backdrop> bc = actorImages.getResults();
-                Images images = new Images();
-                images.setBackdrops(bc);
-
-                for (Backdrop b : bc) {
-                    if (b.getWidth() > b.getHeight()) {
-                        Picasso.with(ActorActivity.this).load(Constants.URL_BASE_IMG + Constants.BACKDROP_SIZE_W1280 + b.getFilePath()).into(actorFirstImage);
-                        break;
-                    }
-                }
+            public void success(Credits credits, Response response) {
+                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.ACTOR_TV_SHOWS);
+                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_tv_shows_list);
+                horizontalListView.setAdapter(creditsAdapter);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.e(LOG_TAG, "Failed to load actor images", error);
+                Log.e(LOG_TAG, "Failed to load actor", error);
+
             }
         });
+    }
+
+    /**
+     * Calls api method that finds all movie for given actor id, and then sets movies into a list
+     *
+     * @param actorId <code>long</code> type value of actor id
+     */
+    private void populateActorMovies(long actorId) {
+
+        api.findActorMovies(actorId, new Callback<Credits>() {
+            @Override
+            public void success(Credits credits, Response response) {
+                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.ACTOR_MOVIES);
+                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_movies_list);
+                horizontalListView.setAdapter(creditsAdapter);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(LOG_TAG, "Failed to load actor", error);
+
+            }
+        });
+    }
+
+    /**
+     * Calls api method that finds actor data for given actor id, and then sets received data into appropriate views
+     *
+     * @param actorId <code>long</code> type value of actor id
+     */
+    private void populateActorData(long actorId) {
 
         api.findActor(actorId, new Callback<Actor>() {
             @Override
@@ -108,39 +147,34 @@ public class ActorActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Failed to load actor", error);
             }
         });
+    }
 
+    /**
+     * Calls api method that finds all actor tagged images for given actor id, and then sets first landscape image into a view
+     *
+     * @param actorId <code>long</code> type value of actor id
+     */
+    private void populateActorBackdropImage(long actorId) {
 
-        api.findActorMovies(actorId, new Callback<Credits>() {
+        api.findActorImages(actorId, new Callback<ActorImages>() {
+
             @Override
-            public void success(Credits credits, Response response) {
-                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.ACTOR_MOVIES);
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_movies_list);
-                horizontalListView.setAdapter(creditsAdapter);
+            public void success(ActorImages actorImages, Response response) {
+                List<Backdrop> bc = actorImages.getResults();
+
+                for (Backdrop b : bc) {
+                    if (b.getWidth() > b.getHeight()) {
+                        Picasso.with(ActorActivity.this).load(Constants.URL_BASE_IMG + Constants.BACKDROP_SIZE_W1280 + b.getFilePath()).into(actorFirstImage);
+                        break;
+                    }
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.e(LOG_TAG, "Failed to load actor", error);
-
+                Log.e(LOG_TAG, "Failed to load actor images", error);
             }
         });
-
-        api.findActorTVShows(actorId, new Callback<Credits>() {
-            @Override
-            public void success(Credits credits, Response response) {
-                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.ACTOR_TV_SHOWS);
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_tv_shows_list);
-                horizontalListView.setAdapter(creditsAdapter);
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e(LOG_TAG, "Failed to load actor", error);
-
-            }
-        });
-
-
     }
 
     @Override

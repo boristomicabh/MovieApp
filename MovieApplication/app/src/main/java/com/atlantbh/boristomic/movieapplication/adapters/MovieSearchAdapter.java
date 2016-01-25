@@ -44,7 +44,7 @@ public class MovieSearchAdapter extends BaseAdapter {
         return position;
     }
 
-    private View getView(final Context context, final View convertView, final ViewGroup viewGroup) {
+    private View initConvertView(final Context context, final View convertView, final ViewGroup viewGroup) {
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(context);
             final View view = layoutInflater.inflate(R.layout.search_movie, viewGroup, false);
@@ -56,7 +56,7 @@ public class MovieSearchAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final Context context = parent.getContext();
-        final View view = getView(context, convertView, parent);
+        final View view = initConvertView(context, convertView, parent);
         final TextView movieTitle = (TextView) view.findViewById(R.id.search_movie_title);
         final TextView movieYear = (TextView) view.findViewById(R.id.search_movie_year);
         final Movie movie = movies.get(position);

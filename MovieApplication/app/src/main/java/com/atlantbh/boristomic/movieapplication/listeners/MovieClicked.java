@@ -24,6 +24,12 @@ public class MovieClicked implements View.OnClickListener {
         this.listType = listType;
     }
 
+    /**
+     * Movie activity is started and movie id is passed as parameter or
+     * tv show is passed as parameter if tv show is selected
+     *
+     * @param v <code>View</code> with movie or tv show image and title
+     */
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(context, MovieActivity.class);

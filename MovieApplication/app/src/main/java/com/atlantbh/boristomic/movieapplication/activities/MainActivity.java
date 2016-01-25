@@ -52,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.ListView searchListResults;
     private List<Movie> searchedMovies = new ArrayList<>();
 
+    /**
+     * Sets context to this activity, sets toolbar and it's title.
+     * Finds search list results view and gets api services,
+     * then populates category lists with appropriate data from api.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +83,15 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    /**
+     * Finds menu from menu resources, finds search view and creates adapter for it with list of movies.
+     * When view is opened query text listener is setup and on every typed key api request is processed,
+     * if search query is submitted and some data is found most relevant is displayed, if nothing is found
+     * toast with message is displayed.
+     *
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -105,16 +121,18 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         return true;
                     }
-                    Toast.makeText(context, "Nothing found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Nothing found", Toast.LENGTH_LONG).show();
                     return false;
                 }
             };
             searchView.setOnQueryTextListener(queryTextListener);
         }
-
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * Calls api method that finds all popular movies, and then sets them into a list
+     */
     private void populatePopularMovies() {
         api.listPopularMovies(Constants.QUERY_POPULARITY_DESC, new Callback<MoviesResponse>() {
 
@@ -135,6 +153,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Calls api method that finds all top rated movies, and then sets them into a list
+     */
     private void populateTopRatedMovies() {
         api.listTopRatedMovies(new Callback<MoviesResponse>() {
             @Override
@@ -153,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Calls api method that finds all upcoming movies, and then sets them into a list
+     */
     private void populateUpcomingMovies() {
         api.listUpcomingMovies(new Callback<MoviesResponse>() {
             @Override
@@ -171,6 +195,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Calls api method that finds all top rated tv shows, and then sets them into a list
+     */
     private void populateTopRatedTvShows() {
         api.listTopRatedTvShows(new Callback<MoviesResponse>() {
             @Override
@@ -189,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Calls api method that finds all popular tv shows, and then sets them into a list
+     */
     private void populatePopularTvShows() {
         api.listPopularTvShows(Constants.QUERY_POPULARITY_DESC, new Callback<MoviesResponse>() {
 
@@ -209,6 +239,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Calls api method that searches for movies.
+     * If search is successful list of movies is updated, otherwise list of movies is deleted.
+     *
+     * @param newText <code>String</code> type value of query
+     */
     private void searchMovies(String newText) {
 
         api.findAnyMovie(newText, new Callback<MoviesResponse>() {
@@ -226,6 +262,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Returns context for static use
+     *
+     * @return
+     */
     public static Context getContext() {
         return context;
     }

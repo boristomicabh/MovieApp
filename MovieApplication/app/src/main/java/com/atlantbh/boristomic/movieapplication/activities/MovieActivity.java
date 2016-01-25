@@ -63,6 +63,12 @@ public class MovieActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
+    /**
+     * Sets layout activity_movie.xml, toolbar, rest service and butter knife to find all views.
+     * Movie id or tv show is taken from intent and shown if id is valid (invalid is -1)
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +81,7 @@ public class MovieActivity extends AppCompatActivity {
         ButterKnife.bind(MovieActivity.this);
 
         final Intent intent = getIntent();
-        final long movieId = intent.getLongExtra(Constants.INTENT_KEY, 1);
+        final long movieId = intent.getLongExtra(Constants.INTENT_KEY, -1);
         final int tvShow = intent.getIntExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, -1);
 
         if (tvShow == -1) {
@@ -97,6 +103,12 @@ public class MovieActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    /**
+     * Makes multiple queries to api and populates view with movie data.
+     * Queries called are for finding single movie, movie trailers, movie cast and movie backdrops
+     *
+     * @param movieId <code>long</code> type value of movie id
+     */
     private void showMovie(final long movieId) {
 
         api.findSingleMovie(movieId, new Callback<Movie>() {
@@ -160,6 +172,12 @@ public class MovieActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Makes multiple queries to api and populates view with tv show data.
+     * Queries called are for finding single tv show, tv show trailers, tv show cast and tv show backdrops
+     *
+     * @param movieId <code>long</code> type value of tv show id
+     */
     private void showTVShow(final long movieId) {
 
         api.findSingleTvShow(movieId, new Callback<Movie>() {
@@ -222,38 +240,130 @@ public class MovieActivity extends AppCompatActivity {
         });
     }
 
-    private void populateMovieData(Movie movie, int type, long movieId) {
-        if (type == Constants.MOVIE) {
-            toolbar.setTitle(movie.getTitle());
-            movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.MOVIE));
-            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
-        } else {
-            toolbar.setTitle(movie.getName());
-            movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.TV_SHOWS));
-            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
-        }
-
-        String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W1280, movie);
-
-        if (backdropPath == null) {
-            Picasso.with(MovieActivity.this).load(R.drawable.default_backdrop).into(movieBackdrop);
-        } else {
-            Picasso.with(MovieActivity.this).load(backdropPath).into(movieBackdrop);
-        }
+    // TODO break into smaller methods
+    private void populateMovieData(final Movie movie, final int type, final long movieId) {
+        setToolbarTitle(movie, type);
+        setMovieTitleAndYear(movie, type);
+        setMovieReviewsLink(movie, type, movieId);
+        setMovieBackdropImage(movie);
+        setMovieDurationAndGenre(movie);
+        setMoviePosterImage(movie);
+        setMovieOverview(movie);
+        setMovieRatingBar(movie);
+        setMovieTotalRatingNumberAndVoteCount(movie);
 
         if (movie.isFavourite()) {
             favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
         }
-        movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
-        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(moviePoster);
+    }
+
+    /**
+     * Sets rating number and total votes count of a movie or tv show
+     *
+     * @param movie movie <code>Movie</code> type value of movie
+     */
+    private void setMovieTotalRatingNumberAndVoteCount(Movie movie) {
+        movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
+        movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
+    }
+
+    /**
+     * Sets movie rating bar, movie rating comes from api in number up to 10 max,
+     * 5 star rating bar is used so rating is cut in half to display it properly.
+     *
+     * @param movie <code>Movie</code> type value of movie
+     */
+    private void setMovieRatingBar(Movie movie) {
+        movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
+    }
+
+    /**
+     * Sets movie overview, if overview is longer then 250 characters, shorted version is displayed
+     *
+     * @param movie <code>Movie</code> type value of movie
+     */
+    private void setMovieOverview(Movie movie) {
         if (movie.getOverview().length() > 250) {
             movieOverview.setText(MovieUtils.getShorterOverview(movie));
         } else {
             movieOverview.setText(movie.getOverview());
         }
-        movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
-        movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
-        movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
+    }
+
+    /**
+     * Sets image poster
+     *
+     * @param movie <code>Movie</code> type value of movie
+     */
+    private void setMoviePosterImage(Movie movie) {
+        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W185, movie)).resize(342, 513).into(moviePoster);
+    }
+
+    /**
+     * Sets duration of a movie and it's genre
+     *
+     * @param movie <code>Movie</code> type value of movie
+     */
+    private void setMovieDurationAndGenre(Movie movie) {
+        movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
+    }
+
+    /**
+     * Sets image on top of view, if image is not found default one is set.
+     *
+     * @param movie <code>Movie</code> type value of movie
+     */
+    private void setMovieBackdropImage(final Movie movie) {
+        String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W500, movie);
+
+        if (backdropPath == null) {
+            Picasso.with(MovieActivity.this).load(R.drawable.default_backdrop).into(movieBackdrop);
+        } else {
+            Picasso.with(MovieActivity.this).load(backdropPath).resize(1280, 720).into(movieBackdrop);
+        }
+    }
+
+    /**
+     * Sets link to movie reviews or tv show info page
+     *
+     * @param movie   <code>Movie</code> type value of movie
+     * @param type    <code>int</code> type value of movie or tv show type
+     * @param movieId <code>long</code> type value of movie id or tv show id
+     */
+    private void setMovieReviewsLink(final Movie movie, final int type, final long movieId) {
+        if (type == Constants.MOVIE) {
+            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
+        } else {
+            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
+        }
+    }
+
+    /**
+     * Sets title and year of movie or tv show in default format
+     *
+     * @param movie <code>Movie</code> type value of movie
+     * @param type  <code>int</code> type value of movie or tv show type
+     */
+    private void setMovieTitleAndYear(final Movie movie, final int type) {
+        if (type == Constants.MOVIE) {
+            movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.MOVIE));
+        } else {
+            movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.TV_SHOWS));
+        }
+    }
+
+    /**
+     * Sets title of toolbar same as title of tv show or movie
+     *
+     * @param movie <code>Movie</code> type value of movie
+     * @param type  <code>int</code> type value of movie or tv show type
+     */
+    private void setToolbarTitle(final Movie movie, final int type) {
+        if (type == Constants.MOVIE) {
+            toolbar.setTitle(movie.getTitle());
+        } else {
+            toolbar.setTitle(movie.getName());
+        }
     }
 
 }
