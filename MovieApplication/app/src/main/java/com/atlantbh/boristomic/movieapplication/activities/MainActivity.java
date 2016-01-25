@@ -1,9 +1,8 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -11,15 +10,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.BaseAdapter;
+import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.adapters.MovieAdapter;
+import com.atlantbh.boristomic.movieapplication.adapters.MovieSearchAdapter;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
 import com.atlantbh.boristomic.movieapplication.models.MoviesResponse;
 import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mobi.parchment.widget.adapterview.listview.ListView;
@@ -33,11 +35,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static Context context;
 
-    private List<Movie> popularMovies = null;
-    private List<Movie> topRatedMovies = null;
-    private List<Movie> upcomingMovies = null;
-    private List<Movie> topRatedTvShows = null;
-    private List<Movie> popularTvShows = null;
+    private List<Movie> popularMovies;
+    private List<Movie> topRatedMovies;
+    private List<Movie> upcomingMovies;
+    private List<Movie> topRatedTvShows;
+    private List<Movie> popularTvShows;
 
     private MovieAdapter popularMoviesAdapter;
     private MovieAdapter topRatedMoviesAdapter;
@@ -45,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private MovieAdapter topRatedTvShowsAdapter;
     private MovieAdapter popularTvShowsAdapter;
 
-    private MovieAPI api = null;
+    private MovieAPI api;
 
+    private android.widget.ListView searchListResults;
+    private List<Movie> searchedMovies = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,10 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.title_activity_main);
         setSupportActionBar(toolbar);
+
+        searchListResults = (android.widget.ListView) findViewById(R.id.search_results_list);
 
         api = RestService.get();
         populatePopularMovies();
@@ -72,29 +79,38 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem searchItem = menu.findItem(R.id.search_movie);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        final MenuItem searchItem = menu.findItem(R.id.search_movie);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        final MovieSearchAdapter searchAdapter = new MovieSearchAdapter(searchedMovies);
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setIconifiedByDefault(false);
+        if (!searchView.isShown()) {
+            searchView.onActionViewCollapsed();
+            SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
 
-        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(final String newText) {
+                    searchMovies(newText);
+                    searchListResults.setAdapter(searchAdapter);
+                    searchListResults.bringToFront();
+                    return true;
+                }
 
-            @Override
-            public boolean onQueryTextChange(String newText)
-            {
-                Log.i("onQueryTextChange", newText);
-
-                return true;
-            }
-            @Override
-            public boolean onQueryTextSubmit(String query)
-            {
-                Log.i("onQueryTextSubmit", query);
-
-                return true;
-            }
-        };
-        searchView.setOnQueryTextListener(queryTextListener);
-
-
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    searchMovies(query);
+                    if (searchedMovies != null && searchedMovies.size() > 1) {
+                        Intent intent = new Intent(context, MovieActivity.class);
+                        intent.putExtra(Constants.INTENT_KEY, searchedMovies.get(0).getId());
+                        startActivity(intent);
+                        return true;
+                    }
+                    Toast.makeText(context, "Nothing found", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            };
+            searchView.setOnQueryTextListener(queryTextListener);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -191,6 +207,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void searchMovies(String newText) {
+
+        api.findAnyMovie(newText, new Callback<MoviesResponse>() {
+            @Override
+            public void success(MoviesResponse moviesResponse, Response response) {
+                searchedMovies.clear();
+                searchedMovies.addAll(moviesResponse.getResults());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                searchedMovies.clear();
+                Log.e(LOG_TAG, "Failed to find any films", error);
+            }
+        });
     }
 
     public static Context getContext() {

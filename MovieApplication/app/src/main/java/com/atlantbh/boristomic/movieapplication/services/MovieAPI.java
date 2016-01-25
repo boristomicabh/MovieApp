@@ -57,37 +57,38 @@ public interface MovieAPI {
     @GET(Constants.URL_TV_ID)
     void findSingleTvShow(@Path("id") long id, Callback<Movie> callback);
 
-    @GET(Constants.URL_MOVIE_ID + "/credits")
+    @GET(Constants.URL_MOVIE_CREDITS)
     void findMovieCast(@Path("id") long id, Callback<Credits> callback);
 
-    @GET(Constants.URL_TV_ID + "/credits")
+    @GET(Constants.URL_TV_CREDITS)
     void findTvShowCast(@Path("id") long id, Callback<Credits> callback);
 
-    @GET(Constants.URL_MOVIE_ID + "/videos")
+    @GET(Constants.URL_MOVIE_VIDEOS)
     void findMovieVideo(@Path("id") long id, Callback<Videos> callback);
 
-    @GET(Constants.URL_TV_ID + "/videos")
+    @GET(Constants.URL_TV_VIDEOS)
     void findTvShowVideo(@Path("id") long id, Callback<Videos> callback);
 
-    @GET(Constants.URL_MOVIE_ID + "/images")
+    @GET(Constants.URL_MOVIE_IMAGES)
     void findMovieBackdrops(@Path("id") long id, Callback<Images> callback);
 
-    @GET(Constants.URL_TV_ID + "/images")
+    @GET(Constants.URL_TV_IMAGES)
     void findTvShowBackdrops(@Path("id") long id, Callback<Images> callback);
 
     @GET(Constants.URL_ACTOR_ID)
     void findActor(@Path("id") long id, Callback<Actor> callback);
 
-    @GET(Constants.URL_ACTOR_ID + "/tagged_images")
+    @GET(Constants.URL_ACTOR_TAGGED_IMAGES)
     void findActorImages(@Path("id") long id, Callback<ActorImages> callback);
 
-    @GET(Constants.URL_ACTOR_ID + "/movie_credits")
+    @GET(Constants.URL_ACTOR_MOVIE_CREDITS)
     void findActorMovies(@Path("id") long id, Callback<Credits> callback);
 
-    @GET(Constants.URL_ACTOR_ID + "/tv_credits")
+    @GET(Constants.URL_ACTOR_TV_CREDITS)
     void findActorTVShows(@Path("id") long id, Callback<Credits> callback);
 
-
+    @GET(Constants.URL_SEARCH_MOVIE)
+    void findAnyMovie(@Query(Constants.QUERY_QUERY) String movieName, Callback<MoviesResponse> callback);
 
 
 }

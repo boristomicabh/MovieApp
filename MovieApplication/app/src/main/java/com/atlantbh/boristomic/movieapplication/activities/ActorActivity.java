@@ -36,7 +36,6 @@ public class ActorActivity extends AppCompatActivity {
 
     private final String LOG_TAG = ActorActivity.class.getSimpleName();
     private MovieAPI api;
-    private long movieId;
 
     @Bind(R.id.actor_first_image)
     ImageView actorFirstImage;
@@ -69,10 +68,8 @@ public class ActorActivity extends AppCompatActivity {
 //        Log.v("VELICINA EKRANA", "sirina: " + String.valueOf(width) + " visina: " + String.valueOf(height));
 
 
-
         final Intent intent = getIntent();
         long actorId = intent.getLongExtra(Constants.INTENT_KEY, -1);
-        movieId = intent.getLongExtra(Constants.INTENT_KEY_TYPE_MOVIE, -1);
 
         api.findActorImages(actorId, new Callback<ActorImages>() {
 
@@ -81,12 +78,9 @@ public class ActorActivity extends AppCompatActivity {
                 List<Backdrop> bc = actorImages.getResults();
                 Images images = new Images();
                 images.setBackdrops(bc);
-                //ImageAdapter imageAdapter = new ImageAdapter(images, 100);
-                //final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_image_gallery);
-                //horizontalListView.setAdapter(imageAdapter);
 
                 for (Backdrop b : bc) {
-                    if(b.getWidth() > b.getHeight()) {
+                    if (b.getWidth() > b.getHeight()) {
                         Picasso.with(ActorActivity.this).load(Constants.URL_BASE_IMG + Constants.BACKDROP_SIZE_W1280 + b.getFilePath()).into(actorFirstImage);
                         break;
                     }
@@ -151,8 +145,8 @@ public class ActorActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-            finish();
-            return true;
+        finish();
+        return true;
     }
 
     @Override

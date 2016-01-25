@@ -1,19 +1,16 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.adapters.MovieAdapter;
@@ -106,59 +103,29 @@ public class MovieActivity extends AppCompatActivity {
 
                     @Override
                     public void success(Movie movie, Response response) {
-
-                        toolbar.setTitle(movie.getTitle());
-
-
-                        String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W1280, movie);
-
-                        if (backdropPath == null) {
-                            Picasso.with(MovieActivity.this).load(R.drawable.default_backdrop).into(movieBackdrop);
-                        } else {
-                            Picasso.with(MovieActivity.this).load(backdropPath).into(movieBackdrop);
-                        }
-
-                        if (movie.isFavourite()) {
-                            favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
-                        }
-                        movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.MOVIE));
-                        movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
-
-                        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(moviePoster);
-                        if (movie.getOverview().length() > 250) {
-                            movieOverview.setText(MovieUtils.getShorterOverview(movie));
-                        } else {
-                            movieOverview.setText(movie.getOverview());
-                        }
-                        movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
-                        movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
-                        movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
-                        movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
-
-                        api.findMovieVideo(movieId, new Callback<Videos>() {
-
-                            @Override
-                            public void success(Videos videos, Response response) {
-                                final String trailerKey = MovieUtils.getMovieTrailer(videos);
-                                movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
-                            }
-
-                            @Override
-                            public void failure(RetrofitError error) {
-                                Log.e(LOG_TAG, "Failed to load movie video", error);
-                            }
-                        });
-
+                        populateMovieData(movie, Constants.MOVIE, movieId);
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         Log.e(LOG_TAG, "Failed to load single movie", error);
-
                     }
                 }
-
         );
+
+        api.findMovieVideo(movieId, new Callback<Videos>() {
+
+            @Override
+            public void success(Videos videos, Response response) {
+                final String trailerKey = MovieUtils.getMovieTrailer(videos);
+                movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(LOG_TAG, "Failed to load movie video", error);
+            }
+        });
 
         api.findMovieCast(movieId, new Callback<Credits>() {
             @Override
@@ -194,53 +161,12 @@ public class MovieActivity extends AppCompatActivity {
     }
 
     private void showTVShow(final long movieId) {
+
         api.findSingleTvShow(movieId, new Callback<Movie>() {
+
             @Override
             public void success(Movie movie, Response response) {
-
-                toolbar.setTitle(movie.getName());
-
-                String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W1280, movie);
-
-                if (backdropPath == null) {
-                    Picasso.with(MovieActivity.this).load(R.drawable.default_backdrop).into(movieBackdrop);
-                } else {
-                    Picasso.with(MovieActivity.this).load(backdropPath).into(movieBackdrop);
-                }
-
-                if (movie.isFavourite()) {
-                    favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
-                }
-
-                movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.TV_SHOWS));
-                movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
-                Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(moviePoster);
-                if (movie.getOverview().length() > 250) {
-                    movieOverview.setText(MovieUtils.getShorterOverview(movie));
-                } else {
-                    movieOverview.setText(movie.getOverview());
-                }
-                movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
-                movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
-                movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
-
-                movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
-
-                api.findTvShowVideo(movieId, new Callback<Videos>() {
-
-                    @Override
-                    public void success(Videos videos, Response response) {
-                        final String trailerKey = MovieUtils.getMovieTrailer(videos);
-                        movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        Log.e(LOG_TAG, "Failed to load tv show video", error);
-                    }
-                });
-
-
+                populateMovieData(movie, Constants.TV_SHOWS, movieId);
             }
 
             @Override
@@ -249,12 +175,26 @@ public class MovieActivity extends AppCompatActivity {
             }
         });
 
+        api.findTvShowVideo(movieId, new Callback<Videos>() {
+
+            @Override
+            public void success(Videos videos, Response response) {
+                final String trailerKey = MovieUtils.getMovieTrailer(videos);
+                movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(LOG_TAG, "Failed to load tv show video", error);
+            }
+        });
+
 
         api.findTvShowCast(movieId, new Callback<Credits>() {
+
             @Override
             public void success(Credits credits, Response response) {
                 MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.CAST);
-
                 final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
                 horizontalListView.setAdapter(creditsAdapter);
             }
@@ -280,6 +220,40 @@ public class MovieActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void populateMovieData(Movie movie, int type, long movieId) {
+        if (type == Constants.MOVIE) {
+            toolbar.setTitle(movie.getTitle());
+            movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.MOVIE));
+            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
+        } else {
+            toolbar.setTitle(movie.getName());
+            movieTitleAndYear.setText(MovieUtils.getTitleWithYear(movie, Constants.TV_SHOWS));
+            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
+        }
+
+        String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W1280, movie);
+
+        if (backdropPath == null) {
+            Picasso.with(MovieActivity.this).load(R.drawable.default_backdrop).into(movieBackdrop);
+        } else {
+            Picasso.with(MovieActivity.this).load(backdropPath).into(movieBackdrop);
+        }
+
+        if (movie.isFavourite()) {
+            favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+        }
+        movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
+        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(moviePoster);
+        if (movie.getOverview().length() > 250) {
+            movieOverview.setText(MovieUtils.getShorterOverview(movie));
+        } else {
+            movieOverview.setText(movie.getOverview());
+        }
+        movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
+        movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
+        movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
     }
 
 }

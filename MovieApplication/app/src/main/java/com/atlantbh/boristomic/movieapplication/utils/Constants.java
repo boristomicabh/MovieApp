@@ -23,16 +23,26 @@ public class Constants {
     public static final String URL_TV_ID = "/tv/{id}";
     public static final String URL_ACTOR_ID = "/person/{id}";
     public static final String URL_TV = "/tv";
+    public static final String URL_SEARCH_MOVIE = "/search/movie";
     public static final String URL_DISCOVER_MOVIE = "/discover/movie";
     public static final String URL_DISCOVER_TV = "/discover/tv";
     public static final String URL_TOP_RATED_MOVIES = "/movie/top_rated";
     public static final String URL_UPCOMING_MOVIES = "/movie/upcoming";
     public static final String URL_TOP_RATED_TV_SHOWS = "/tv/top_rated";
     public static final String URL_MOVIE_CREDITS = "/movie/{id}/credits";
+    public static final String URL_TV_CREDITS = "/tv/{id}/credits";
+    public static final String URL_MOVIE_VIDEOS = "/movie/{id}/videos";
+    public static final String URL_TV_VIDEOS = "/tv/{id}/videos";
+    public static final String URL_MOVIE_IMAGES = "/movie/{id}/images";
+    public static final String URL_TV_IMAGES = "/tv/{id}/images";
+    public static final String URL_ACTOR_TAGGED_IMAGES = "/person/{id}/tagged_images";
+    public static final String URL_ACTOR_MOVIE_CREDITS = "/person/{id}/movie_credits";
+    public static final String URL_ACTOR_TV_CREDITS = "/person/{id}/tv_credits";
 
     public static final String URL_BASE = "https://api.themoviedb.org/3";
     public static final String URL_BASE_IMG = "http://image.tmdb.org/t/p/";
 
+    public static final String QUERY_QUERY = "query";
     public static final String QUERY_SORT_BY = "sort_by";
     public static final String QUERY_POPULARITY_DESC = "popularity.desc";
     public static final String QUERY_PRIMARY_RELEASE_YEAR = "primary_release_year";

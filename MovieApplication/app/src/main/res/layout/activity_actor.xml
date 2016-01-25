@@ -110,8 +110,6 @@
                 parchment:snapPosition="start"
                 parchment:snapToPosition="true"/>
 
-
-
             <TextView
                 android:id="@+id/actor_tvshows"
                 android:layout_width="wrap_content"
