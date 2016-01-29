@@ -46,7 +46,10 @@ public class MovieUtils {
     }
 
     public static String getShorterOverview(Movie movie) {
-        return movie.getOverview().substring(0, 230) + "...";
+        if (movie.getOverview().length() > 225) {
+            return movie.getOverview().substring(0, 220) + "...";
+        }
+        return movie.getOverview();
     }
 
     public static String getMovieYear(Movie movie) {
@@ -78,6 +81,8 @@ public class MovieUtils {
     public static String getTitleWithYear(Movie movie, int type) {
         if (type == Constants.TV_SHOWS) {
             return movie.getName() + " (" + getMovieYear(movie) + ")";
+        } else if (type == Constants.UPCOMING_MOVIES) {
+            return movie.getTitle() + " (" + getUpcomingMovieDate(movie) + ")";
         }
         return movie.getTitle() + " (" + getMovieYear(movie) + ")";
     }
@@ -156,9 +161,17 @@ public class MovieUtils {
         return getMovieTime(movie) + " | " + getGenreNames(movie);
     }
 
+    public static float getMovieFloatRating(Movie movie) {
+        return (float) movie.getVoteAverage() / 2;
+    }
+
+    public static String getMovieStringRating(Movie movie) {
+        return String.format("%.1f", movie.getVoteAverage() / 2);
+    }
+
     private static String getGenreNames(Movie movie) {
         StringBuilder builder = new StringBuilder();
-        for(Genre g : movie.getGenres()) {
+        for (Genre g : movie.getGenres()) {
             builder.append(g.getName());
             builder.append(" ");
         }

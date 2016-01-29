@@ -6,19 +6,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.adapters.MovieAdapter;
 import com.atlantbh.boristomic.movieapplication.listeners.MovieReviewClicked;
 import com.atlantbh.boristomic.movieapplication.listeners.MovieVideosClicked;
 import com.atlantbh.boristomic.movieapplication.models.Credits;
 import com.atlantbh.boristomic.movieapplication.models.Images;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
+import com.atlantbh.boristomic.movieapplication.models.MovieDB;
 import com.atlantbh.boristomic.movieapplication.models.Videos;
 import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
@@ -28,7 +28,7 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import mobi.parchment.widget.adapterview.listview.ListView;
+import io.realm.Realm;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -62,6 +62,7 @@ public class MovieActivity extends AppCompatActivity {
     ImageView movieReviewsLink;
 
     private Toolbar toolbar;
+    private Realm realm;
 
     /**
      * Sets layout activity_movie.xml, toolbar, rest service and butter knife to find all views.
@@ -76,6 +77,8 @@ public class MovieActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        realm = Realm.getInstance(this);
 
         api = RestService.get();
         ButterKnife.bind(MovieActivity.this);
@@ -142,10 +145,10 @@ public class MovieActivity extends AppCompatActivity {
         api.findMovieCast(movieId, new Callback<Credits>() {
             @Override
             public void success(Credits credits, Response response) {
-                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.CAST);
-
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
-                horizontalListView.setAdapter(creditsAdapter);
+//                MovieAdapterOld creditsAdapter = new MovieAdapterOld(null, null, credits, Constants.CAST, 0);
+//
+//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
+//                horizontalListView.setAdapter(creditsAdapter);
             }
 
             @Override
@@ -158,9 +161,9 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Images images, Response response) {
-                MovieAdapter imageAdapter = new MovieAdapter(null, images, null, Constants.IMAGE);
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
-                horizontalListView.setAdapter(imageAdapter);
+//                MovieAdapterOld imageAdapter = new MovieAdapterOld(null, images, null, Constants.IMAGE, 0);
+//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
+//                horizontalListView.setAdapter(imageAdapter);
             }
 
             @Override
@@ -212,9 +215,9 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Credits credits, Response response) {
-                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.CAST);
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
-                horizontalListView.setAdapter(creditsAdapter);
+//                MovieAdapterOld creditsAdapter = new MovieAdapterOld(null, null, credits, Constants.CAST, 0);
+//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
+//                horizontalListView.setAdapter(creditsAdapter);
             }
 
             @Override
@@ -227,9 +230,9 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Images images, Response response) {
-                MovieAdapter imageAdapter = new MovieAdapter(null, images, null, Constants.IMAGE);
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
-                horizontalListView.setAdapter(imageAdapter);
+//                MovieAdapterOld imageAdapter = new MovieAdapterOld(null, images, null, Constants.IMAGE, 0);
+//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
+//                horizontalListView.setAdapter(imageAdapter);
             }
 
             @Override
@@ -240,7 +243,13 @@ public class MovieActivity extends AppCompatActivity {
         });
     }
 
-    // TODO break into smaller methods
+    /**
+     * Populates movie data with information from api, calls different methods that do the job
+     *
+     * @param movie   <code>Movie</code> type value of movie
+     * @param type    <code>int</code> type value of movie or tv show type
+     * @param movieId <code>long</code> type value of movie id or tv show id
+     */
     private void populateMovieData(final Movie movie, final int type, final long movieId) {
         setToolbarTitle(movie, type);
         setMovieTitleAndYear(movie, type);
@@ -252,9 +261,43 @@ public class MovieActivity extends AppCompatActivity {
         setMovieRatingBar(movie);
         setMovieTotalRatingNumberAndVoteCount(movie);
 
-        if (movie.isFavourite()) {
-            favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+        final MovieDB movieDB = realm.where(MovieDB.class).equalTo("id", movie.getId()).findFirst();
+
+        if (movieDB != null) {
+            if (movieDB.isFavourite()) {
+                favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+            }
         }
+
+        favouriteIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                realm.beginTransaction();
+                MovieDB movieToSave = realm.where(MovieDB.class).equalTo("id", movie.getId()).findFirst();
+                realm.commitTransaction();
+                if (movieToSave != null) {
+                    realm.beginTransaction();
+
+                    if (movieToSave.isFavourite()) {
+                        movieToSave.setIsFavourite(false);
+                        favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_movie);
+                    } else {
+                        movieToSave.setIsFavourite(true);
+                        favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+                    }
+                    realm.commitTransaction();
+                } else {
+                    realm.beginTransaction();
+                    movieToSave = realm.createObject(MovieDB.class);
+                    movieToSave.setId(movie.getId());
+                    movieToSave.setTitle(movie.getTitle());
+                    movieToSave.setName(movie.getName());
+                    movieToSave.setIsFavourite(true);
+                    realm.commitTransaction();
+                    favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+                }
+            }
+        });
     }
 
     /**
@@ -296,7 +339,7 @@ public class MovieActivity extends AppCompatActivity {
      * @param movie <code>Movie</code> type value of movie
      */
     private void setMoviePosterImage(Movie movie) {
-        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W185, movie)).resize(342, 513).into(moviePoster);
+        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W185, movie)).into(moviePoster);
     }
 
     /**
@@ -366,4 +409,11 @@ public class MovieActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        if (realm != null && !realm.isClosed()) {
+            realm.close();
+        }
+        super.onDestroy();
+    }
 }

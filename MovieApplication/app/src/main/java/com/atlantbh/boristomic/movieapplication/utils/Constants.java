@@ -48,6 +48,8 @@ public class Constants {
     public static final String QUERY_PRIMARY_RELEASE_YEAR = "primary_release_year";
     public static final String QUERY_API_KEY = "api_key";
 
+    public static final String PATH_ID = "id";
+
     public static final String POSTER_SIZE_W92 = "w92";
     public static final String POSTER_SIZE_W154 = "w154";
     public static final String POSTER_SIZE_W185 = "w185";
@@ -72,7 +74,14 @@ public class Constants {
     public static final int ACTOR_MOVIES = 7;
     public static final int ACTOR_TV_SHOWS = 8;
 
+    public static final int MOST_POPULAR_MOVIES_LIST = 11;
+    public static final int TOP_RATED_MOVIES_LIST = 12;
+    public static final int UPCOMING_MOVIES_LIST = 13;
+    public static final int MOST_POPULAR_TV_SHOWS_LIST = 14;
+    public static final int TOP_RATED_TV_SHOWS_LIST = 15;
+
     public static final String INTENT_KEY = "id";
+    public static final String FRAGMENT_KEY = "list type";
     public static final String INTENT_KEY_TYPE_TV_SHOW = "tvShow";
     public static final String INTENT_KEY_TYPE_MOVIE = "movie";
 

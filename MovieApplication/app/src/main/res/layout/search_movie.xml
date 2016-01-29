@@ -2,8 +2,9 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="35dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:padding="10dp"
     android:weightSum="3">
 
     <TextView
@@ -12,17 +13,18 @@
         android:layout_height="match_parent"
         android:layout_weight="2"
         android:textStyle="bold"
+        android:textSize="17sp"
         android:textColor="@color/colorGray"
-        android:layout_centerVertical="true"/>
+        android:gravity="center_vertical"/>
 
     <TextView
         android:id="@+id/search_movie_year"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:textSize="15sp"
         android:textColor="@color/colorGray"
         android:layout_alignParentEnd="true"
-        android:textAlignment="viewEnd"
-        android:layout_centerVertical="true" />
+        android:gravity="center_vertical|end"/>
 
 </LinearLayout>

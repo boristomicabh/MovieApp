@@ -11,12 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.adapters.MovieAdapter;
 import com.atlantbh.boristomic.movieapplication.models.Actor;
 import com.atlantbh.boristomic.movieapplication.models.ActorImages;
 import com.atlantbh.boristomic.movieapplication.models.Backdrop;
 import com.atlantbh.boristomic.movieapplication.models.Credits;
-import com.atlantbh.boristomic.movieapplication.models.Images;
 import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
@@ -89,9 +87,9 @@ public class ActorActivity extends AppCompatActivity {
         api.findActorTVShows(actorId, new Callback<Credits>() {
             @Override
             public void success(Credits credits, Response response) {
-                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.ACTOR_TV_SHOWS);
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_tv_shows_list);
-                horizontalListView.setAdapter(creditsAdapter);
+//                MovieAdapterOld creditsAdapter = new MovieAdapterOld(null, null, credits, Constants.ACTOR_TV_SHOWS, 0);
+//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_tv_shows_list);
+//                horizontalListView.setAdapter(creditsAdapter);
             }
 
             @Override
@@ -112,9 +110,9 @@ public class ActorActivity extends AppCompatActivity {
         api.findActorMovies(actorId, new Callback<Credits>() {
             @Override
             public void success(Credits credits, Response response) {
-                MovieAdapter creditsAdapter = new MovieAdapter(null, null, credits, Constants.ACTOR_MOVIES);
-                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_movies_list);
-                horizontalListView.setAdapter(creditsAdapter);
+//                MovieAdapterOld creditsAdapter = new MovieAdapterOld(null, null, credits, Constants.ACTOR_MOVIES, 0);
+//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.actor_movies_list);
+//                horizontalListView.setAdapter(creditsAdapter);
             }
 
             @Override

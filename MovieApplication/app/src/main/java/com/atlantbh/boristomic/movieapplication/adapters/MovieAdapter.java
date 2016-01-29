@@ -1,168 +1,77 @@
 package com.atlantbh.boristomic.movieapplication.adapters;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.activities.ActorActivity;
-import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
-import com.atlantbh.boristomic.movieapplication.listeners.ActorClicked;
-import com.atlantbh.boristomic.movieapplication.listeners.MovieClicked;
-import com.atlantbh.boristomic.movieapplication.models.Backdrop;
-import com.atlantbh.boristomic.movieapplication.models.Cast;
-import com.atlantbh.boristomic.movieapplication.models.Credits;
-import com.atlantbh.boristomic.movieapplication.models.Images;
+import com.atlantbh.boristomic.movieapplication.holders.MovieHolder;
 import com.atlantbh.boristomic.movieapplication.models.Movie;
-import com.atlantbh.boristomic.movieapplication.utils.Constants;
-import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
-
 /**
- * Created by boristomic on 19/01/16.
+ * Created by boristomic on 28/01/16.
  */
-public class MovieAdapter extends BaseAdapter {
+public class MovieAdapter extends RecyclerView.Adapter<MovieHolder> {
 
     private List<Movie> movies;
-    private List<Backdrop> backdrops;
-    private List<Cast> cast;
+    private Context context;
     private int listType;
 
-    public MovieAdapter(List<Movie> movies, Images images, Credits credits, int listType) {
+    /**
+     * Public constructor of MovieAdapter used to get list of movies so it can be used to setup RecyclerView.
+     * Initializes context so it can be passed to MovieHolder for action events, and to setup inflater.
+     * And list type so MovieHolder can setup appropriate parameters.
+     *
+     * @param movies   <code>List</code> type object of movies
+     * @param context  <code>Context</code> type object of activity called from
+     * @param listType <code>int</code> type object of list type
+     */
+    public MovieAdapter(List<Movie> movies, Context context, int listType) {
         this.movies = movies;
-        if (images != null) {
-            if (images.getBackdrops() == null) {
-                if (images.getProfiles().size() > 10) {
-                    this.backdrops = images.getProfiles().subList(0, 10);
-                } else {
-                    this.backdrops = images.getProfiles();
-                }
-            } else {
-                if (images.getBackdrops().size() > 10) {
-                    this.backdrops = images.getBackdrops().subList(0, 10);
-                } else {
-                    this.backdrops = images.getBackdrops();
-                }
-            }
-        }
-        if (credits != null) {
-            if (credits.getCast().size() > 10) {
-                this.cast = credits.getCast().subList(0, 10);
-            } else {
-                this.cast = credits.getCast();
-            }
-        }
+        this.context = context;
         this.listType = listType;
     }
 
+    /**
+     * Creates LayoutInflater from context, and then inflates movie_list_view.xml layout.
+     * Then creates new MovieHolder with inflated view, and passes context for event action
+     * and listType.
+     *
+     * @param parent   <code>ViewGroup</code> type object of parent view
+     * @param viewType <code>int</code> type value of viewType
+     * @return <code>MovieHolder</code> type object
+     */
     @Override
-    public int getCount() {
-        if (movies != null) {
-            return movies.size();
-        } else if (backdrops != null) {
-            return backdrops.size();
-        }
-        return cast.size();
+    public MovieHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.movie_list_view, parent, false);
+        return new MovieHolder(view, context, listType);
     }
 
+    /**
+     * Binds <code>Movie</code> type object to new element in RecyclerView.
+     *
+     * @param holder   <code>MovieHolder</code> type object
+     * @param position <code>int</code> type value of <code>Movie</code> position in list of movies
+     */
     @Override
-    public Object getItem(int position) {
-        if (movies != null) {
-            return movies.get(position);
-        } else if (backdrops != null) {
-            return backdrops.get(position);
-        }
-        return cast.get(position);
+    public void onBindViewHolder(MovieHolder holder, int position) {
+        final Movie movie = movies.get(position);
+        holder.bindMovie(movie);
     }
 
+    /**
+     * Returns size of movie list, total count of elements
+     *
+     * @return <code>int</code> type value of movie list size
+     */
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    private View initConverView(final Context context, final View convertView, final ViewGroup viewGroup) {
-        if (convertView == null) {
-            final LayoutInflater layoutInflater = LayoutInflater.from(context);
-            final View view = layoutInflater.inflate(R.layout.movie_list_view, viewGroup, false);
-            return view;
-        }
-        return convertView;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        final Context context = parent.getContext();
-        final View view = initConverView(context, convertView, parent);
-        final TextView mMovieTitle = (TextView) view.findViewById(R.id.list_movie_title);
-        final ImageView mMoviePoster = (ImageView) view.findViewById(R.id.list_movie_poster);
-        final TextView mMovieYear = (TextView) view.findViewById(R.id.list_movie_year);
-
-        // TV Shows and movies, show on Feed screen
-        if (Constants.OTHER_LISTS == listType || Constants.UPCOMING_MOVIES == listType || Constants.TV_SHOWS == listType) {
-            final Movie temp = movies.get(position);
-            if (listType == Constants.TV_SHOWS) {
-                mMovieTitle.setText(temp.getName());
-            } else {
-                mMovieTitle.setText(temp.getTitle());
-            }
-            Picasso.with(context).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W185, temp)).resize(342, 513).into(mMoviePoster);
-            if (listType == Constants.UPCOMING_MOVIES) {
-                mMovieYear.setText(MovieUtils.getUpcomingMovieDate(temp));
-            } else {
-                mMovieYear.setText(MovieUtils.getMovieYear(temp));
-            }
-            view.setOnClickListener(new MovieClicked(temp, context, listType));
-            return view;
-        }
-
-        // Show images in list view
-        if (Constants.IMAGE == listType) {
-            final Backdrop temp = backdrops.get(position);
-            if (temp.getWidth() > temp.getHeight()) {
-                Picasso.with(context).load(MovieUtils.getBackdropURLForGallery(Constants.BACKDROP_SIZE_W300, temp)).into(mMoviePoster);
-            }
-            // TODO add pager for gallery
-            return view;
-        }
-
-
-        // Only cast left to populate
-        final Cast temp = cast.get(position);
-
-        // Show list of actor movies and tv shows
-        if (Constants.ACTOR_MOVIES == listType || Constants.ACTOR_TV_SHOWS == listType) {
-            Picasso.with(context).load(MovieUtils.getCastImageURL(Constants.POSTER_SIZE_W154, temp)).resize(185, 262).into(mMoviePoster);
-            if (Constants.ACTOR_MOVIES == listType) {
-                mMovieTitle.setText(temp.getOriginalTitle());
-            } else {
-                mMovieTitle.setText(temp.getName());
-            }
-            return view;
-        }
-
-        // Show list of actors in a movie
-        mMovieTitle.setText(temp.getName());
-        Picasso.with(context).load(MovieUtils.getCastImageURL(Constants.PROFILE_SIZE_W185, temp)).resize(185, 262).into(mMoviePoster);
-        view.setOnClickListener(new ActorClicked(temp, context));
-        return view;
+    public int getItemCount() {
+        return movies.size();
     }
 
 }
