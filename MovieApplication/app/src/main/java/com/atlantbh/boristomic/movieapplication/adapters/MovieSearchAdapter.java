@@ -1,8 +1,6 @@
 package com.atlantbh.boristomic.movieapplication.adapters;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
+import com.atlantbh.boristomic.movieapplication.listeners.MovieClicked;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 
@@ -61,7 +59,7 @@ public class MovieSearchAdapter extends BaseAdapter {
         final Movie movie = movies.get(position);
         movieTitle.setText(movie.getOriginalTitle());
         movieYear.setText(MovieUtils.getMovieYear(movie));
-        //view.setOnClickListener(new MovieClicked(movie, context, Constants.MOVIE));
+        view.setOnClickListener(new MovieClicked(movie, context, Constants.MOVIE));
         return view;
     }
 }

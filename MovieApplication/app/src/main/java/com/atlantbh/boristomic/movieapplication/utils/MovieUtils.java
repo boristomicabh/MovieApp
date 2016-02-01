@@ -1,18 +1,12 @@
 package com.atlantbh.boristomic.movieapplication.utils;
 
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
-
-import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
-import com.atlantbh.boristomic.movieapplication.models.Actor;
-import com.atlantbh.boristomic.movieapplication.models.Backdrop;
-import com.atlantbh.boristomic.movieapplication.models.Cast;
-import com.atlantbh.boristomic.movieapplication.models.Genre;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
-import com.atlantbh.boristomic.movieapplication.models.Trailer;
-import com.atlantbh.boristomic.movieapplication.models.Videos;
+import com.atlantbh.boristomic.movieapplication.models.rest.Actor;
+import com.atlantbh.boristomic.movieapplication.models.rest.Backdrop;
+import com.atlantbh.boristomic.movieapplication.models.rest.Cast;
+import com.atlantbh.boristomic.movieapplication.models.rest.Genre;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.Trailer;
+import com.atlantbh.boristomic.movieapplication.models.rest.Videos;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -171,9 +165,11 @@ public class MovieUtils {
 
     private static String getGenreNames(Movie movie) {
         StringBuilder builder = new StringBuilder();
-        for (Genre g : movie.getGenres()) {
-            builder.append(g.getName());
-            builder.append(" ");
+        for (int i = 0; i < movie.getGenres().size(); i++) {
+            builder.append(movie.getGenres().get(i).getName());
+            if (i + 1 != movie.getGenres().size()) {
+                builder.append(", ");
+            }
         }
         return builder.toString();
     }

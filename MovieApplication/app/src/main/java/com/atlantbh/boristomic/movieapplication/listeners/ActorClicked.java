@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import com.atlantbh.boristomic.movieapplication.activities.ActorActivity;
-import com.atlantbh.boristomic.movieapplication.models.Cast;
+import com.atlantbh.boristomic.movieapplication.models.rest.Cast;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 
 /**

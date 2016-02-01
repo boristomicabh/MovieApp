@@ -3,6 +3,7 @@ package com.atlantbh.boristomic.movieapplication.holders;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -10,7 +11,7 @@ import android.widget.TextView;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 import com.squareup.picasso.Picasso;
@@ -65,10 +66,14 @@ public class MovieHolder extends RecyclerView.ViewHolder implements View.OnClick
 
         final Movie temp = movie;
         mMovieTitle.setText(MovieUtils.getTitleWithYear(temp, listType));
-        Picasso.with(context).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, temp)).into(mMoviePoster);
         mMovieRatingStars.setRating(MovieUtils.getMovieFloatRating(movie));
         mMovieRatingNumber.setText(MovieUtils.getMovieStringRating(movie));
         mMovieOverview.setText(MovieUtils.getShorterOverview(movie));
+        if (temp.getPosterPath() == null) {
+            Picasso.with(context).load(R.drawable.poster_default).into(mMoviePoster);
+        } else {
+            Picasso.with(context).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, temp)).into(mMoviePoster);
+        }
     }
 
     /**

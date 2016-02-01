@@ -6,15 +6,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.models.Actor;
-import com.atlantbh.boristomic.movieapplication.models.ActorImages;
-import com.atlantbh.boristomic.movieapplication.models.Backdrop;
-import com.atlantbh.boristomic.movieapplication.models.Credits;
+import com.atlantbh.boristomic.movieapplication.models.rest.Actor;
+import com.atlantbh.boristomic.movieapplication.models.rest.ActorImages;
+import com.atlantbh.boristomic.movieapplication.models.rest.Backdrop;
+import com.atlantbh.boristomic.movieapplication.models.rest.Credits;
 import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
@@ -25,7 +24,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import mobi.parchment.widget.adapterview.listview.ListView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

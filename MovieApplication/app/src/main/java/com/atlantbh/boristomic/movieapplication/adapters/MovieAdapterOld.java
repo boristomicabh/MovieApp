@@ -17,11 +17,11 @@
 //import com.atlantbh.boristomic.movieapplication.activities.MovieActivity;
 //import com.atlantbh.boristomic.movieapplication.listeners.ActorClicked;
 //import com.atlantbh.boristomic.movieapplication.listeners.MovieClicked;
-//import com.atlantbh.boristomic.movieapplication.models.Backdrop;
-//import com.atlantbh.boristomic.movieapplication.models.Cast;
-//import com.atlantbh.boristomic.movieapplication.models.Credits;
-//import com.atlantbh.boristomic.movieapplication.models.Images;
-//import com.atlantbh.boristomic.movieapplication.models.Movie;
+//import com.atlantbh.boristomic.movieapplication.models.rest.Backdrop;
+//import com.atlantbh.boristomic.movieapplication.models.rest.Cast;
+//import com.atlantbh.boristomic.movieapplication.models.rest.Credits;
+//import com.atlantbh.boristomic.movieapplication.models.rest.Images;
+//import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 //import com.atlantbh.boristomic.movieapplication.utils.Constants;
 //import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 //import com.squareup.picasso.Picasso;

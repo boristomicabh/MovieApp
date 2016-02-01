@@ -1,4 +1,4 @@
-package com.atlantbh.boristomic.movieapplication.models;
+package com.atlantbh.boristomic.movieapplication.models.rest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +107,7 @@ public class Movie {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -1,4 +1,4 @@
-package com.atlantbh.boristomic.movieapplication.models;
+package com.atlantbh.boristomic.movieapplication.models.rest;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

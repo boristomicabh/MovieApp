@@ -1,30 +1,41 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
+import com.atlantbh.boristomic.movieapplication.adapters.DrawerAdapter;
+import com.atlantbh.boristomic.movieapplication.adapters.SlideshowPagerAdapter;
+import com.atlantbh.boristomic.movieapplication.listeners.DrawerMenuItemClicked;
 import com.atlantbh.boristomic.movieapplication.listeners.MovieReviewClicked;
 import com.atlantbh.boristomic.movieapplication.listeners.MovieVideosClicked;
-import com.atlantbh.boristomic.movieapplication.models.Credits;
-import com.atlantbh.boristomic.movieapplication.models.Images;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
+import com.atlantbh.boristomic.movieapplication.models.DrawerItem;
 import com.atlantbh.boristomic.movieapplication.models.MovieDB;
-import com.atlantbh.boristomic.movieapplication.models.Videos;
+import com.atlantbh.boristomic.movieapplication.models.rest.Credits;
+import com.atlantbh.boristomic.movieapplication.models.rest.Images;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.Videos;
 import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -36,30 +47,40 @@ import retrofit.client.Response;
 public class MovieActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private String[] drawerItemTitles;
+    private TypedArray drawerItemIcons;
+    private List<DrawerItem> drawerItems;
+    private DrawerAdapter drawerAdapter;
+
     private MovieAPI api;
 
-    @Bind(R.id.backdrop_movie_image)
-    ImageView movieBackdrop;
     @Bind(R.id.favourite_icon)
-    Button favouriteIcon;
+    protected ImageView favouriteIcon;
     @Bind(R.id.movie_title_year)
-    TextView movieTitleAndYear;
+    protected TextView movieTitleAndYear;
     @Bind(R.id.movie_duration_genre)
-    TextView movieDurationAndGenre;
+    protected TextView movieDurationAndGenre;
     @Bind(R.id.movie_poster)
-    ImageView moviePoster;
+    protected ImageView moviePoster;
     @Bind(R.id.movie_overview)
-    TextView movieOverview;
+    protected TextView movieOverview;
     @Bind(R.id.movie_video_link)
-    ImageView movieVideo;
+    protected ImageView movieVideo;
     @Bind(R.id.movie_rating_bar)
-    RatingBar movieRatingBar;
+    protected RatingBar movieRatingBar;
     @Bind(R.id.movie_rating_number)
-    TextView movieRatingNumber;
+    protected TextView movieRatingNumber;
     @Bind(R.id.movie_total_votes)
-    TextView movieTotalVotes;
+    protected TextView movieTotalVotes;
     @Bind(R.id.movie_reviews_link)
-    ImageView movieReviewsLink;
+    protected ImageView movieReviewsLink;
+    @Bind(R.id.view_pager_backdrop_image)
+    protected ViewPager viewPager;
+    @Bind(R.id.default_backdrop_image)
+    protected ImageView defaultBackdrop;
 
     private Toolbar toolbar;
     private Realm realm;
@@ -82,6 +103,19 @@ public class MovieActivity extends AppCompatActivity {
 
         api = RestService.get();
         ButterKnife.bind(MovieActivity.this);
+
+        drawerItemTitles = getResources().getStringArray(R.array.drawer_menu_titles);
+        drawerItemIcons = getResources().obtainTypedArray(R.array.drawer_menu_icons);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerList = (ListView) findViewById(R.id.drawer_list);
+        drawerItems = new ArrayList<>();
+        drawerItems.add(new DrawerItem(drawerItemTitles[0], drawerItemIcons.getResourceId(0, -1)));
+        drawerItems.add(new DrawerItem(drawerItemTitles[1], drawerItemIcons.getResourceId(1, -1)));
+        drawerItems.add(new DrawerItem(drawerItemTitles[2], drawerItemIcons.getResourceId(2, -1)));
+        drawerItemIcons.recycle();
+        drawerAdapter = new DrawerAdapter(drawerItems);
+        drawerList.setAdapter(drawerAdapter);
+        drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getBaseContext()));
 
         final Intent intent = getIntent();
         final long movieId = intent.getLongExtra(Constants.INTENT_KEY, -1);
@@ -161,9 +195,14 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Images images, Response response) {
-//                MovieAdapterOld imageAdapter = new MovieAdapterOld(null, images, null, Constants.IMAGE, 0);
-//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
-//                horizontalListView.setAdapter(imageAdapter);
+                if (images.getBackdrops().size() == 0) {
+                    defaultBackdrop.setVisibility(View.VISIBLE);
+                    viewPager.setVisibility(View.GONE);
+                    Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
+                } else {
+                    SlideshowPagerAdapter slideshowPagerAdapter = new SlideshowPagerAdapter(MovieActivity.this, images.getBackdrops());
+                    viewPager.setAdapter(slideshowPagerAdapter);
+                }
             }
 
             @Override
@@ -171,7 +210,6 @@ public class MovieActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Failed to load movie backdrops", error);
             }
         });
-
 
     }
 
@@ -230,9 +268,14 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Images images, Response response) {
-//                MovieAdapterOld imageAdapter = new MovieAdapterOld(null, images, null, Constants.IMAGE, 0);
-//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_backdrop_list);
-//                horizontalListView.setAdapter(imageAdapter);
+                if (images.getBackdrops().size() == 0) {
+                    defaultBackdrop.setVisibility(View.VISIBLE);
+                    viewPager.setVisibility(View.GONE);
+                    Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
+                } else {
+                    SlideshowPagerAdapter slideshowPagerAdapter = new SlideshowPagerAdapter(MovieActivity.this, images.getBackdrops());
+                    viewPager.setAdapter(slideshowPagerAdapter);
+                }
             }
 
             @Override
@@ -254,14 +297,13 @@ public class MovieActivity extends AppCompatActivity {
         setToolbarTitle(movie, type);
         setMovieTitleAndYear(movie, type);
         setMovieReviewsLink(movie, type, movieId);
-        setMovieBackdropImage(movie);
         setMovieDurationAndGenre(movie);
         setMoviePosterImage(movie);
         setMovieOverview(movie);
         setMovieRatingBar(movie);
         setMovieTotalRatingNumberAndVoteCount(movie);
 
-        final MovieDB movieDB = realm.where(MovieDB.class).equalTo("id", movie.getId()).findFirst();
+        final MovieDB movieDB = MovieDB.findMovieById(realm, movieId);
 
         if (movieDB != null) {
             if (movieDB.isFavourite()) {
@@ -272,29 +314,19 @@ public class MovieActivity extends AppCompatActivity {
         favouriteIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                realm.beginTransaction();
-                MovieDB movieToSave = realm.where(MovieDB.class).equalTo("id", movie.getId()).findFirst();
-                realm.commitTransaction();
+                MovieDB movieToSave = MovieDB.findMovieById(realm, movieId);
                 if (movieToSave != null) {
-                    realm.beginTransaction();
-
-                    if (movieToSave.isFavourite()) {
-                        movieToSave.setIsFavourite(false);
-                        favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_movie);
-                    } else {
-                        movieToSave.setIsFavourite(true);
+                    if (MovieDB.updateMovieFavourite(realm, movieToSave)) {
                         favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+                    } else {
+                        favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_movie);
                     }
-                    realm.commitTransaction();
                 } else {
-                    realm.beginTransaction();
-                    movieToSave = realm.createObject(MovieDB.class);
-                    movieToSave.setId(movie.getId());
-                    movieToSave.setTitle(movie.getTitle());
-                    movieToSave.setName(movie.getName());
-                    movieToSave.setIsFavourite(true);
-                    realm.commitTransaction();
-                    favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+                    if (MovieDB.saveNewMovie(realm, movie)) {
+                        favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+                    } else {
+                        Toast.makeText(MovieActivity.this, "Failed to save movie to database", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -306,7 +338,7 @@ public class MovieActivity extends AppCompatActivity {
      * @param movie movie <code>Movie</code> type value of movie
      */
     private void setMovieTotalRatingNumberAndVoteCount(Movie movie) {
-        movieRatingNumber.setText(String.valueOf(movie.getVoteAverage()));
+        movieRatingNumber.setText(MovieUtils.getMovieStringRating(movie));
         movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
     }
 
@@ -317,7 +349,7 @@ public class MovieActivity extends AppCompatActivity {
      * @param movie <code>Movie</code> type value of movie
      */
     private void setMovieRatingBar(Movie movie) {
-        movieRatingBar.setRating((float) movie.getVoteAverage() / 2);
+        movieRatingBar.setRating(MovieUtils.getMovieFloatRating(movie));
     }
 
     /**
@@ -339,7 +371,11 @@ public class MovieActivity extends AppCompatActivity {
      * @param movie <code>Movie</code> type value of movie
      */
     private void setMoviePosterImage(Movie movie) {
-        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W185, movie)).into(moviePoster);
+        if (movie.getPosterPath() == null) {
+            Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
+        } else {
+            Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(moviePoster);
+        }
     }
 
     /**
@@ -351,20 +387,6 @@ public class MovieActivity extends AppCompatActivity {
         movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
     }
 
-    /**
-     * Sets image on top of view, if image is not found default one is set.
-     *
-     * @param movie <code>Movie</code> type value of movie
-     */
-    private void setMovieBackdropImage(final Movie movie) {
-        String backdropPath = MovieUtils.getBackdropURL(Constants.BACKDROP_SIZE_W500, movie);
-
-        if (backdropPath == null) {
-            Picasso.with(MovieActivity.this).load(R.drawable.default_backdrop).into(movieBackdrop);
-        } else {
-            Picasso.with(MovieActivity.this).load(backdropPath).resize(1280, 720).into(movieBackdrop);
-        }
-    }
 
     /**
      * Sets link to movie reviews or tv show info page

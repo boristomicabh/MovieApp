@@ -1,7 +1,9 @@
-package com.atlantbh.boristomic.movieapplication.models;
+package com.atlantbh.boristomic.movieapplication.models.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

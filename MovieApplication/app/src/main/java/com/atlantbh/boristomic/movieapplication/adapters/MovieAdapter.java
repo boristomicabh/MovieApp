@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.holders.MovieHolder;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 
 import java.util.List;
 

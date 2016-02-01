@@ -1,6 +1,6 @@
 package com.atlantbh.boristomic.movieapplication.fragments;
 
-import android.net.Uri;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,9 +12,12 @@ import android.view.ViewGroup;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.adapters.MovieAdapter;
-import com.atlantbh.boristomic.movieapplication.models.MoviesResponse;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.MoviesResponse;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
+
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -25,6 +28,9 @@ public class MovieListFragment extends Fragment {
     private final String LOG_TAG = MovieListFragment.class.getSimpleName();
 
     private int listType;
+    private List<Movie> movies;
+    private RecyclerView recyclerView;
+    private MovieAdapter movieAdapter;
 
     /**
      * Default empty constructor
@@ -47,6 +53,11 @@ public class MovieListFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        //super.onSaveInstanceState(outState);
+    }
+
     /**
      * Retrieves list type from bundle
      *
@@ -55,6 +66,7 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         listType = getArguments().getInt(Constants.FRAGMENT_KEY);
     }
 
@@ -72,17 +84,18 @@ public class MovieListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View fragmentView = inflater.inflate(R.layout.fragment_movie_list, container, false);
+        recyclerView = (RecyclerView) fragmentView.findViewById(R.id.movies_feed_list);
 
         if (Constants.MOST_POPULAR_MOVIES_LIST == listType) {
-            populatePopularMovies(fragmentView);
+            populatePopularMovies();
         } else if (Constants.TOP_RATED_MOVIES_LIST == listType) {
-            populateTopRatedMovies(fragmentView);
+            populateTopRatedMovies();
         } else if (Constants.UPCOMING_MOVIES_LIST == listType) {
-            populateUpcomingMovies(fragmentView);
+            populateUpcomingMovies();
         } else if (Constants.MOST_POPULAR_TV_SHOWS_LIST == listType) {
-            populatePopularTvShows(fragmentView);
+            populatePopularTvShows();
         } else {
-            populateTopRatedTvShows(fragmentView);
+            populateTopRatedTvShows();
         }
         return fragmentView;
     }
@@ -90,14 +103,14 @@ public class MovieListFragment extends Fragment {
     /**
      * Calls api method that finds all popular movies, and then sets them into a list
      */
-    private void populatePopularMovies(final View fragmentView) {
+    private void populatePopularMovies() {
         RestService.get().listPopularMovies(Constants.QUERY_POPULARITY_DESC, new Callback<MoviesResponse>() {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
-                //final MovieAdapterOld movieAdapter = new MovieAdapterOld(moviesResponse.getResults(), null, null, Constants.OTHER_LISTS, 800);
-                final RecyclerView recyclerView = (RecyclerView) fragmentView.findViewById(R.id.movies_feed_list);
+                movies = moviesResponse.getResults();
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                recyclerView.setAdapter(new MovieAdapter(moviesResponse.getResults(), getActivity().getBaseContext(), Constants.OTHER_LISTS));
+                movieAdapter = new MovieAdapter(movies, getActivity().getBaseContext(), Constants.OTHER_LISTS);
+                recyclerView.setAdapter(movieAdapter);
             }
 
             @Override
@@ -110,13 +123,14 @@ public class MovieListFragment extends Fragment {
     /**
      * Calls api method that finds all top rated movies, and then sets them into a list
      */
-    private void populateTopRatedMovies(final View fragmentView) {
+    private void populateTopRatedMovies() {
         RestService.get().listTopRatedMovies(new Callback<MoviesResponse>() {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
-                final RecyclerView recyclerView = (RecyclerView) fragmentView.findViewById(R.id.movies_feed_list);
+                movies = moviesResponse.getResults();
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                recyclerView.setAdapter(new MovieAdapter(moviesResponse.getResults(), getActivity().getBaseContext(), Constants.OTHER_LISTS));
+                movieAdapter = new MovieAdapter(movies, getActivity().getBaseContext(), Constants.OTHER_LISTS);
+                recyclerView.setAdapter(movieAdapter);
             }
 
             @Override
@@ -129,13 +143,14 @@ public class MovieListFragment extends Fragment {
     /**
      * Calls api method that finds all upcoming movies, and then sets them into a list
      */
-    private void populateUpcomingMovies(final View fragmentView) {
+    private void populateUpcomingMovies() {
         RestService.get().listUpcomingMovies(new Callback<MoviesResponse>() {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
-                final RecyclerView recyclerView = (RecyclerView) fragmentView.findViewById(R.id.movies_feed_list);
+                movies = moviesResponse.getResults();
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                recyclerView.setAdapter(new MovieAdapter(moviesResponse.getResults(), getActivity().getBaseContext(), Constants.UPCOMING_MOVIES));
+                movieAdapter = new MovieAdapter(movies, getActivity().getBaseContext(), Constants.UPCOMING_MOVIES);
+                recyclerView.setAdapter(movieAdapter);
             }
 
             @Override
@@ -148,13 +163,14 @@ public class MovieListFragment extends Fragment {
     /**
      * Calls api method that finds all popular tv shows, and then sets them into a list
      */
-    private void populatePopularTvShows(final View fragmentView) {
+    private void populatePopularTvShows() {
         RestService.get().listPopularTvShows(Constants.QUERY_POPULARITY_DESC, new Callback<MoviesResponse>() {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
-                final RecyclerView recyclerView = (RecyclerView) fragmentView.findViewById(R.id.movies_feed_list);
+                movies = moviesResponse.getResults();
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                recyclerView.setAdapter(new MovieAdapter(moviesResponse.getResults(), getActivity().getBaseContext(), Constants.TV_SHOWS));
+                movieAdapter = new MovieAdapter(movies, getActivity().getBaseContext(), Constants.TV_SHOWS);
+                recyclerView.setAdapter(movieAdapter);
             }
 
             @Override
@@ -168,13 +184,14 @@ public class MovieListFragment extends Fragment {
     /**
      * Calls api method that finds all top rated tv shows, and then sets them into a list
      */
-    private void populateTopRatedTvShows(final View fragmentView) {
+    private void populateTopRatedTvShows() {
         RestService.get().listTopRatedTvShows(new Callback<MoviesResponse>() {
             @Override
             public void success(MoviesResponse moviesResponse, Response response) {
-                final RecyclerView recyclerView = (RecyclerView) fragmentView.findViewById(R.id.movies_feed_list);
+                movies = moviesResponse.getResults();
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                recyclerView.setAdapter(new MovieAdapter(moviesResponse.getResults(), getActivity().getBaseContext(), Constants.TV_SHOWS));
+                movieAdapter = new MovieAdapter(movies, getActivity().getBaseContext(), Constants.TV_SHOWS);
+                recyclerView.setAdapter(movieAdapter);
             }
 
             @Override
@@ -182,6 +199,22 @@ public class MovieListFragment extends Fragment {
                 Log.e(LOG_TAG, "Failed to get list of top rated TV Shows from API", error);
             }
         });
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Log.v("orijentacija", "landscape");
+            updateUI();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            updateUI();
+            Log.v("orijentacija", "portrait");
+        }
+    }
+
+    private void updateUI() {
+        movieAdapter.notifyDataSetChanged();
     }
 
     @Override

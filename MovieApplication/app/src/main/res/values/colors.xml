@@ -8,7 +8,7 @@
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
     <color name="colorBackground">#4A4A4A</color>
-    <color name="colorAccent">#c8e8ff</color>
+    <color name="colorAccent">#ffffff</color>
     <color name="colorGray">#D6D6D6</color>
     <color name="colorLightGray">#E6E6E6</color>
     <color name="colorWhite">#ffffff</color>

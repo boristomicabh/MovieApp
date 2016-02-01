@@ -7,16 +7,31 @@
     <string name="top_rated_tvshows_title" translatable="true">Top Rated TV Shows</string>
     <string name="most_popular_tvshows_title" translatable="true">Most popular TV Shows</string>
     <string name="title_activity_movie"></string>
-    <string name="user_rating_title">Your\n\rRating</string>
-    <string name="user_rating_value">Not Yet Rated</string>
-    <string name="movie_cast">Cast</string>
-    <string name="movie_gallery_title">Gallery</string>
     <string name="title_activity_actor"></string>
-    <string name="search_title">Search</string>
+    <string name="user_rating_title" translatable="true">My \r\nRating</string>
+    <string name="user_rating_value" translatable="true">Not Yet Rated</string>
+    <string name="movie_cast">Top Billed Cast</string>
+    <string name="movie_gallery_title">Gallery</string>
+    <string name="search_title" translatable="true">Search</string>
+    <string name="favourite_remove_button" translatable="true">Remove</string>
+    <string name="trailer_title" translatable="true">See Trailer</string>
+    <string name="reviews_title" translatable="true">Read Reviews</string>
 
-    <string name="one">First fragment</string>
+    <!-- Drawer menu items title -->
+    <string-array name="drawer_menu_titles">
+        <item>Home</item>
+        <item>Favourites</item>
+        <item>My Ratings</item>
+    </string-array>
+
+    <!-- Drawer menu item icons -->
+    <array name="drawer_menu_icons">
+        <item>@drawable/ic_drawer_home</item>
+        <item>@drawable/ic_drawer_heart</item>
+        <item>@drawable/ic_drawer_star</item>
+    </array>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_favourite_movies">Favourite Movies</string>
 
 </resources>

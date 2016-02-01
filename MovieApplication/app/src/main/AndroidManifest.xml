@@ -10,19 +10,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/MyMaterialTheme">
-
         <activity
             android:name=".activities.MainActivity"
-            android:configChanges="orientation|screenSize"
+            android:configChanges="orientation|screenLayout|screenSize"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".activities.MovieActivity"
             android:configChanges="orientation|screenSize"
@@ -32,7 +28,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
-
         <activity
             android:name=".activities.ActorActivity"
             android:configChanges="orientation|screenSize"
@@ -42,8 +37,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MovieActivity" />
         </activity>
-
+        <activity
+            android:name=".activities.FavouriteMoviesActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_favourite_movies"
+            android:parentActivityName=".activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
+        </activity>
     </application>
-
 
 </manifest>

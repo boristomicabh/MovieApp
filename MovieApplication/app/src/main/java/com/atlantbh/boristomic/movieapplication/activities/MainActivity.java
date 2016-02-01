@@ -1,43 +1,41 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Point;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
+import com.atlantbh.boristomic.movieapplication.adapters.DrawerAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.MovieSearchAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.ViewPagerAdapter;
 import com.atlantbh.boristomic.movieapplication.fragments.MovieListFragment;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
-import com.atlantbh.boristomic.movieapplication.models.MoviesResponse;
-import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
+import com.atlantbh.boristomic.movieapplication.listeners.DrawerMenuItemClicked;
+import com.atlantbh.boristomic.movieapplication.models.DrawerItem;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.MoviesResponse;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -45,6 +43,15 @@ import retrofit.client.Response;
 public class MainActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private ActionBarDrawerToggle drawerToggle;
+    private CharSequence drawerTitle;
+    private String[] drawerItemTitles;
+    private TypedArray drawerItemIcons;
+    private List<DrawerItem> drawerItems;
+    private DrawerAdapter drawerAdapter;
 
     private ListView searchListResults;
     private Toolbar toolbar;
@@ -55,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Movie> searchedMovies = new ArrayList<>();
 
     private int screenWidth;
-
 
     /**
      * Sets context to this activity, sets toolbar and it's title.
@@ -72,24 +78,45 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
-        searchListResults = (android.widget.ListView) findViewById(R.id.search_results_list);
-
+        searchListResults = (ListView) findViewById(R.id.search_results_list);
+        toolbar.setNavigationIcon(R.drawable.ic_drawer);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setupViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
 
+        // new stuff
+        drawerTitle = getTitle();
+        drawerItemTitles = getResources().getStringArray(R.array.drawer_menu_titles);
+        drawerItemIcons = getResources().obtainTypedArray(R.array.drawer_menu_icons);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerList = (ListView) findViewById(R.id.drawer_list);
+        drawerItems = new ArrayList<>();
+        drawerItems.add(new DrawerItem(drawerItemTitles[0], drawerItemIcons.getResourceId(0, -1)));
+        drawerItems.add(new DrawerItem(drawerItemTitles[1], drawerItemIcons.getResourceId(1, -1)));
+        drawerItems.add(new DrawerItem(drawerItemTitles[2], drawerItemIcons.getResourceId(2, -1)));
+        drawerItemIcons.recycle();
+        drawerAdapter = new DrawerAdapter(drawerItems);
+        drawerList.setAdapter(drawerAdapter);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                getActionBar().setTitle(drawerTitle);
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(drawerTitle);
+                invalidateOptionsMenu();
+            }
+        };
+        drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getContext()));
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int densityDpi = metrics.densityDpi;
         float scaledDensity = metrics.scaledDensity;
-
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int screenWidth = size.x;
-        int screenHeight = size.y;
 
         Log.v("gustoca", String.valueOf(metrics.densityDpi));
         Log.v("font sp", String.valueOf(metrics.scaledDensity));
@@ -197,6 +224,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * Returns context for static use

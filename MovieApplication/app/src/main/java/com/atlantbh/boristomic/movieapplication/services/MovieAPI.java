@@ -1,13 +1,12 @@
 package com.atlantbh.boristomic.movieapplication.services;
 
-import com.atlantbh.boristomic.movieapplication.models.Actor;
-import com.atlantbh.boristomic.movieapplication.models.ActorImages;
-import com.atlantbh.boristomic.movieapplication.models.Cast;
-import com.atlantbh.boristomic.movieapplication.models.Credits;
-import com.atlantbh.boristomic.movieapplication.models.Images;
-import com.atlantbh.boristomic.movieapplication.models.Movie;
-import com.atlantbh.boristomic.movieapplication.models.MoviesResponse;
-import com.atlantbh.boristomic.movieapplication.models.Videos;
+import com.atlantbh.boristomic.movieapplication.models.rest.Actor;
+import com.atlantbh.boristomic.movieapplication.models.rest.ActorImages;
+import com.atlantbh.boristomic.movieapplication.models.rest.Credits;
+import com.atlantbh.boristomic.movieapplication.models.rest.Images;
+import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.MoviesResponse;
+import com.atlantbh.boristomic.movieapplication.models.rest.Videos;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 
 import retrofit.Callback;
