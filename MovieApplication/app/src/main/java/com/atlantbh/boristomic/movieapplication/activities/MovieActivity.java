@@ -2,37 +2,48 @@ package com.atlantbh.boristomic.movieapplication.activities;
 
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.adapters.DrawerAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.SlideshowPagerAdapter;
+import com.atlantbh.boristomic.movieapplication.listeners.ActorClicked;
 import com.atlantbh.boristomic.movieapplication.listeners.DrawerMenuItemClicked;
 import com.atlantbh.boristomic.movieapplication.listeners.MovieReviewClicked;
 import com.atlantbh.boristomic.movieapplication.listeners.MovieVideosClicked;
 import com.atlantbh.boristomic.movieapplication.models.DrawerItem;
 import com.atlantbh.boristomic.movieapplication.models.MovieDB;
+import com.atlantbh.boristomic.movieapplication.models.rest.Cast;
 import com.atlantbh.boristomic.movieapplication.models.rest.Credits;
 import com.atlantbh.boristomic.movieapplication.models.rest.Images;
 import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 import com.atlantbh.boristomic.movieapplication.models.rest.Videos;
 import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
+import com.atlantbh.boristomic.movieapplication.utils.Connection;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
+import com.atlantbh.boristomic.movieapplication.utils.PosterLoader;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,9 +92,12 @@ public class MovieActivity extends AppCompatActivity {
     protected ViewPager viewPager;
     @Bind(R.id.default_backdrop_image)
     protected ImageView defaultBackdrop;
+    @Bind(R.id.top_billed_actors_layout)
+    protected LinearLayout topBilledCast;
 
     private Toolbar toolbar;
     private Realm realm;
+    private PosterLoader target;
 
     /**
      * Sets layout activity_movie.xml, toolbar, rest service and butter knife to find all views.
@@ -98,11 +112,14 @@ public class MovieActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ButterKnife.bind(MovieActivity.this);
+        target = new PosterLoader(moviePoster, toolbar);
 
         realm = Realm.getInstance(this);
 
-        api = RestService.get();
-        ButterKnife.bind(MovieActivity.this);
+        final Intent intent = getIntent();
+        final long movieId = intent.getLongExtra(Constants.INTENT_KEY, -1);
+        final int tvShow = intent.getIntExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, -1);
 
         drawerItemTitles = getResources().getStringArray(R.array.drawer_menu_titles);
         drawerItemIcons = getResources().obtainTypedArray(R.array.drawer_menu_icons);
@@ -117,16 +134,47 @@ public class MovieActivity extends AppCompatActivity {
         drawerList.setAdapter(drawerAdapter);
         drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getBaseContext()));
 
-        final Intent intent = getIntent();
-        final long movieId = intent.getLongExtra(Constants.INTENT_KEY, -1);
-        final int tvShow = intent.getIntExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, -1);
-
-        if (tvShow == -1) {
-            showMovie(movieId);
+        if (!Connection.checkNetworkConnection(this)) {
+            populateMovieDataLight(movieId, tvShow);
         } else {
-            showTVShow(movieId);
-        }
 
+            api = RestService.get();
+
+            if (tvShow == -1) {
+                showMovie(movieId);
+            } else {
+                showTVShow(movieId);
+            }
+        }
+    }
+
+    private void populateMovieDataLight(long movieId, int tvShow) {
+        MovieDB movie = MovieDB.findMovieById(realm, movieId);
+        if (tvShow == -1) {
+            toolbar.setTitle(movie.getTitle());
+            movieTitleAndYear.setText(movie.getTitle() + " (" + movie.getReleaseDate() + ")");
+            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
+
+        } else {
+            toolbar.setTitle(movie.getName());
+            movieTitleAndYear.setText(movie.getName() + " (" + movie.getReleaseDate() + ")");
+            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
+
+        }
+        movieDurationAndGenre.setText(movie.getRuntime() + " | " + movie.getGenres());
+        Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
+        if (movie.getOverview().length() > 250) {
+            movieOverview.setText(movie.getOverview().substring(0, 220) + "...");
+        } else {
+            movieOverview.setText(movie.getOverview());
+        }
+        movieRatingBar.setRating(movie.getVote());
+        movieRatingNumber.setText(movie.getVoteAverage());
+        movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
+        setMovieFavourite(movieId, null);
+        defaultBackdrop.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.GONE);
+        Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
     }
 
     @Override
@@ -179,10 +227,9 @@ public class MovieActivity extends AppCompatActivity {
         api.findMovieCast(movieId, new Callback<Credits>() {
             @Override
             public void success(Credits credits, Response response) {
-//                MovieAdapterOld creditsAdapter = new MovieAdapterOld(null, null, credits, Constants.CAST, 0);
-//
-//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
-//                horizontalListView.setAdapter(creditsAdapter);
+                for (int i = 0; i < 3; i++) {
+                    setTopBilledCast(credits.getCast(), i);
+                }
             }
 
             @Override
@@ -253,9 +300,9 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Credits credits, Response response) {
-//                MovieAdapterOld creditsAdapter = new MovieAdapterOld(null, null, credits, Constants.CAST, 0);
-//                final ListView horizontalListView = (ListView<BaseAdapter>) findViewById(R.id.movie_cast_list);
-//                horizontalListView.setAdapter(creditsAdapter);
+                for (int i = 0; i < 3; i++) {
+                    setTopBilledCast(credits.getCast(), i);
+                }
             }
 
             @Override
@@ -302,7 +349,11 @@ public class MovieActivity extends AppCompatActivity {
         setMovieOverview(movie);
         setMovieRatingBar(movie);
         setMovieTotalRatingNumberAndVoteCount(movie);
+        setMovieFavourite(movieId, movie);
 
+    }
+
+    private void setMovieFavourite(final long movieId, final Movie movie) {
         final MovieDB movieDB = MovieDB.findMovieById(realm, movieId);
 
         if (movieDB != null) {
@@ -331,6 +382,7 @@ public class MovieActivity extends AppCompatActivity {
             }
         });
     }
+
 
     /**
      * Sets rating number and total votes count of a movie or tv show
@@ -374,7 +426,7 @@ public class MovieActivity extends AppCompatActivity {
         if (movie.getPosterPath() == null) {
             Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
         } else {
-            Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(moviePoster);
+            Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(target);
         }
     }
 
@@ -428,6 +480,42 @@ public class MovieActivity extends AppCompatActivity {
             toolbar.setTitle(movie.getTitle());
         } else {
             toolbar.setTitle(movie.getName());
+        }
+    }
+
+    private void setTopBilledCast(List<Cast> casts, int position) {
+        if (casts != null || casts.size() != 0) {
+            if (position < casts.size()) {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+                params.setMargins(13, 13, 13, 13);
+                LinearLayout linearLayout = new LinearLayout(this);
+                linearLayout.setLayoutParams(params);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.setWeightSum(4.0f);
+
+                ImageView castImage = new ImageView(this);
+                castImage.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 2.6f));
+                castImage.setScaleType(ImageView.ScaleType.FIT_XY);
+
+                if (casts.get(position).getProfilePath() == null) {
+                    Picasso.with(this).load(R.drawable.profile_default).into(castImage);
+                } else {
+                    Picasso.with(this).load(MovieUtils.getCastImageURL(Constants.PROFILE_SIZE_W185, casts.get(position))).into(castImage);
+                }
+
+                TextView castName = new TextView(this);
+                castName.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.4f));
+                castName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                castName.setText(casts.get(position).getName());
+
+                linearLayout.addView(castImage);
+                linearLayout.addView(castName);
+                linearLayout.setOnClickListener(new ActorClicked(casts.get(position), this));
+
+                topBilledCast.addView(linearLayout);
+            }
+        } else {
+            topBilledCast.setVisibility(View.INVISIBLE);
         }
     }
 

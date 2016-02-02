@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -31,6 +32,7 @@ import com.atlantbh.boristomic.movieapplication.models.DrawerItem;
 import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 import com.atlantbh.boristomic.movieapplication.models.rest.MoviesResponse;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
+import com.atlantbh.boristomic.movieapplication.utils.Connection;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
 
 import java.util.ArrayList;
@@ -113,24 +115,12 @@ public class MainActivity extends AppCompatActivity {
         };
         drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getContext()));
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int densityDpi = metrics.densityDpi;
-        float scaledDensity = metrics.scaledDensity;
-
-        Log.v("gustoca", String.valueOf(metrics.densityDpi));
-        Log.v("font sp", String.valueOf(metrics.scaledDensity));
-        Log.v("velicina fonta 40", String.valueOf(40 / metrics.scaledDensity));
-        Log.v("velicina fonta 35", String.valueOf(35 / metrics.scaledDensity));
-        Log.v("velicina fonta 20", String.valueOf(20 / metrics.scaledDensity));
-
-        Log.v("velicina dp 540px", String.valueOf(540 / (metrics.densityDpi / 160)));
-        Log.v("velicina dp 540px", String.valueOf(540 / (metrics.densityDpi / 160)));
-        Log.v("velicina dp 60px", String.valueOf(60 / (metrics.densityDpi / 160)));
-        Log.v("velicina dp 50px", String.valueOf(50 / (metrics.densityDpi / 160)));
-        Log.v("velicina dp 40px", String.valueOf(40 / (metrics.densityDpi / 160)));
-        Log.v("velicina dp 20px", String.valueOf(20 / (metrics.densityDpi / 160)));
+        if (!Connection.checkNetworkConnection(this)) {
+            Toast.makeText(this, "You don't have internet connection, browse favourites.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, FavouriteMoviesActivity.class));
+        }
     }
+
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());

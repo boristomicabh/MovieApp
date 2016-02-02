@@ -34,4 +34,5 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'mobi.parchment:parchment:1.6.9@aar'
     compile 'io.realm:realm-android:0.87.3'
+    compile 'com.android.support:palette-v7:23.1.1'
 }

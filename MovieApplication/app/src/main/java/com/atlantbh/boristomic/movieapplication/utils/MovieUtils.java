@@ -163,7 +163,7 @@ public class MovieUtils {
         return String.format("%.1f", movie.getVoteAverage() / 2);
     }
 
-    private static String getGenreNames(Movie movie) {
+    public static String getGenreNames(Movie movie) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < movie.getGenres().size(); i++) {
             builder.append(movie.getGenres().get(i).getName());
@@ -174,7 +174,7 @@ public class MovieUtils {
         return builder.toString();
     }
 
-    private static String getMovieTime(Movie movie) {
+    public static String getMovieTime(Movie movie) {
         if (movie.getRuntime() != 0) {
             int hours = movie.getRuntime() / 60;
             int min = movie.getRuntime() - 60 * hours;

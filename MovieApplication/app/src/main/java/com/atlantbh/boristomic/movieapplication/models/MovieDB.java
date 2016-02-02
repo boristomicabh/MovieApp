@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 
 import java.util.List;
 
@@ -23,6 +24,13 @@ public class MovieDB extends RealmObject {
     private String title;
     private String name;
     private boolean isFavourite = false;
+    private String overview;
+    private String releaseDate;
+    private String runtime;
+    private String voteAverage;
+    private float vote;
+    private String genres;
+    private int voteCount;
 
     public long getId() {
         return id;
@@ -54,6 +62,62 @@ public class MovieDB extends RealmObject {
 
     public void setIsFavourite(boolean isFavourite) {
         this.isFavourite = isFavourite;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public String getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(String runtime) {
+        this.runtime = runtime;
+    }
+
+    public String getVoteAverage() {
+        return voteAverage;
+    }
+
+    public void setVoteAverage(String voteAverage) {
+        this.voteAverage = voteAverage;
+    }
+
+    public String getGenres() {
+        return genres;
+    }
+
+    public void setGenres(String genres) {
+        this.genres = genres;
+    }
+
+    public float getVote() {
+        return vote;
+    }
+
+    public void setVote(float vote) {
+        this.vote = vote;
+    }
+
+    public int getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(int voteCount) {
+        this.voteCount = voteCount;
     }
 
     /**
@@ -102,6 +166,13 @@ public class MovieDB extends RealmObject {
             movieToSave.setTitle(movie.getTitle());
             movieToSave.setName(movie.getName());
             movieToSave.setIsFavourite(true);
+            movieToSave.setRuntime(MovieUtils.getMovieTime(movie));
+            movieToSave.setGenres(MovieUtils.getGenreNames(movie));
+            movieToSave.setReleaseDate(MovieUtils.getMovieYear(movie));
+            movieToSave.setOverview(movie.getOverview());
+            movieToSave.setVoteAverage(MovieUtils.getMovieStringRating(movie));
+            movieToSave.setVote(MovieUtils.getMovieFloatRating(movie));
+            movieToSave.setVoteCount(movie.getVoteCount());
             realm.commitTransaction();
             return true;
         } catch (Exception e) {
