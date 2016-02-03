@@ -16,6 +16,7 @@
     <string name="favourite_remove_button" translatable="true">Remove</string>
     <string name="trailer_title" translatable="true">See Trailer</string>
     <string name="reviews_title" translatable="true">Read Reviews</string>
+    <string name="clickable_cast_more" translatable="true">See More Cast</string>
 
     <!-- Drawer menu items title -->
     <string-array name="drawer_menu_titles">

@@ -19,6 +19,7 @@ public class PosterLoader implements Target {
 
     private ImageView posterImage;
     private Toolbar toolbar;
+    private static int vibrantColor;
 
     public PosterLoader(ImageView posterImage, Toolbar toolbar) {
         this.posterImage = posterImage;
@@ -36,9 +37,11 @@ public class PosterLoader implements Target {
                         Palette.Swatch color = palette.getVibrantSwatch();
                         Palette.Swatch color2 = palette.getMutedSwatch();
                         if (color != null) {
+                            vibrantColor = color.getRgb();
                             toolbar.setBackgroundColor(color.getRgb());
                         } else {
                             if (color2 != null) {
+                                vibrantColor = color2.getRgb();
                                 toolbar.setBackgroundColor(color2.getRgb());
                             }
                         }
@@ -56,5 +59,9 @@ public class PosterLoader implements Target {
     @Override
     public void onPrepareLoad(Drawable placeHolderDrawable) {
         Log.e(LOG_TAG, "Failed to load bitmap onPrepareLoad" );
+    }
+
+    public static int vibrantColor() {
+        return vibrantColor;
     }
 }

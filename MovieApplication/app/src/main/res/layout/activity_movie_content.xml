@@ -3,18 +3,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:descendantFocusability="beforeDescendants"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusableInTouchMode="true">
 
-        <!-- Backdrop gallery -->
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager_backdrop_image"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="200dp">
+
+
+            <!-- Backdrop gallery -->
+            <android.support.v4.view.ViewPager
+                android:id="@+id/view_pager_backdrop_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+
+            <com.viewpagerindicator.CirclePageIndicator
+                android:id="@+id/pager_indicator"
+                android:layout_alignBottom="@id/view_pager_backdrop_image"
+                android:padding="1dp"
+                android:layout_marginBottom="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+        </RelativeLayout>
 
         <!-- Default backdrop image -->
         <ImageView
@@ -256,17 +275,45 @@
             android:textColor="@color/colorBackground"
             android:textStyle="bold" />
 
-        <!-- Top cast, 3 is shown programmatically -->
-        <LinearLayout
-            android:id="@+id/top_billed_actors_layout"
+        <!-- List of cast horizontal scroll -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/movie_cast_list"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_marginTop="1dp"
-            android:background="@color/colorWhite"
-            android:orientation="horizontal"
-            android:weightSum="3">
+            android:layout_height="220dp" />
 
-        </LinearLayout>
+
+        <!--&lt;!&ndash; Top cast, 3 is shown programmatically &ndash;&gt;-->
+        <!--<LinearLayout-->
+            <!--android:id="@+id/top_billed_actors_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="250dp"-->
+            <!--android:layout_marginTop="1dp"-->
+            <!--android:background="@color/colorWhite"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:weightSum="3">-->
+
+        <!--</LinearLayout>-->
+
+        <!--&lt;!&ndash; Clickable cast dropdown &ndash;&gt;-->
+        <!--<TextView-->
+            <!--android:id="@+id/more_cast_link"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textAlignment="viewEnd"-->
+            <!--android:text="@string/clickable_cast_more"-->
+            <!--android:clickable="true"-->
+            <!--android:onClick="toggleContent" />-->
+
+        <!--<LinearLayout-->
+            <!--android:id="@+id/more_actors_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="250dp"-->
+            <!--android:layout_marginTop="1dp"-->
+            <!--android:background="@color/colorWhite"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:weightSum="3" >-->
+
+        <!--</LinearLayout>-->
 
     </LinearLayout>
 

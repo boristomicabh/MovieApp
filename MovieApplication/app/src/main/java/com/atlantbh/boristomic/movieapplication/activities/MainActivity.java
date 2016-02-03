@@ -1,10 +1,8 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -13,12 +11,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -115,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         };
         drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getContext()));
 
-        if (!Connection.checkNetworkConnection(this)) {
+        if (!Connection.isConnected(this)) {
             Toast.makeText(this, "You don't have internet connection, browse favourites.", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, FavouriteMoviesActivity.class));
         }

@@ -2,13 +2,12 @@ package com.atlantbh.boristomic.movieapplication.activities;
 
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
+import com.atlantbh.boristomic.movieapplication.adapters.CastListAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.DrawerAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.SlideshowPagerAdapter;
 import com.atlantbh.boristomic.movieapplication.listeners.ActorClicked;
@@ -43,7 +43,7 @@ import com.atlantbh.boristomic.movieapplication.utils.Constants;
 import com.atlantbh.boristomic.movieapplication.utils.MovieUtils;
 import com.atlantbh.boristomic.movieapplication.utils.PosterLoader;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +92,17 @@ public class MovieActivity extends AppCompatActivity {
     protected ViewPager viewPager;
     @Bind(R.id.default_backdrop_image)
     protected ImageView defaultBackdrop;
-    @Bind(R.id.top_billed_actors_layout)
-    protected LinearLayout topBilledCast;
+    @Bind(R.id.movie_cast_list)
+    protected RecyclerView castList;
+    @Bind(R.id.pager_indicator)
+    protected CirclePageIndicator indicator;
+
+//    @Bind(R.id.top_billed_actors_layout)
+//    protected LinearLayout topBilledCast;
+//    @Bind(R.id.more_cast_link)
+//    protected TextView moreCastLink;
+//    @Bind(R.id.more_actors_layout)
+//    protected LinearLayout moreCastLayout;
 
     private Toolbar toolbar;
     private Realm realm;
@@ -134,7 +143,7 @@ public class MovieActivity extends AppCompatActivity {
         drawerList.setAdapter(drawerAdapter);
         drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getBaseContext()));
 
-        if (!Connection.checkNetworkConnection(this)) {
+        if (!Connection.isConnected(this)) {
             populateMovieDataLight(movieId, tvShow);
         } else {
 
@@ -227,9 +236,11 @@ public class MovieActivity extends AppCompatActivity {
         api.findMovieCast(movieId, new Callback<Credits>() {
             @Override
             public void success(Credits credits, Response response) {
-                for (int i = 0; i < 3; i++) {
-                    setTopBilledCast(credits.getCast(), i);
-                }
+                castList.setLayoutManager(new LinearLayoutManager(MovieActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                castList.setAdapter(new CastListAdapter(credits.getCast(), MovieActivity.this));
+//                for (int i = 0; i < 3; i++) {
+//                    setTopBilledCast(credits.getCast(), i);
+//                }
             }
 
             @Override
@@ -249,6 +260,8 @@ public class MovieActivity extends AppCompatActivity {
                 } else {
                     SlideshowPagerAdapter slideshowPagerAdapter = new SlideshowPagerAdapter(MovieActivity.this, images.getBackdrops());
                     viewPager.setAdapter(slideshowPagerAdapter);
+                    indicator.setViewPager(viewPager);
+//                    indicator.setFillColor(PosterLoader.vibrantColor());
                 }
             }
 
@@ -300,9 +313,9 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Credits credits, Response response) {
-                for (int i = 0; i < 3; i++) {
-                    setTopBilledCast(credits.getCast(), i);
-                }
+//                for (int i = 0; i < 3; i++) {
+//                    setTopBilledCast(credits.getCast(), i);
+//                }
             }
 
             @Override
@@ -427,6 +440,7 @@ public class MovieActivity extends AppCompatActivity {
             Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
         } else {
             Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(target);
+            indicator.setFillColor(PosterLoader.vibrantColor());
         }
     }
 
@@ -483,41 +497,48 @@ public class MovieActivity extends AppCompatActivity {
         }
     }
 
-    private void setTopBilledCast(List<Cast> casts, int position) {
-        if (casts != null || casts.size() != 0) {
-            if (position < casts.size()) {
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
-                params.setMargins(13, 13, 13, 13);
-                LinearLayout linearLayout = new LinearLayout(this);
-                linearLayout.setLayoutParams(params);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                linearLayout.setWeightSum(4.0f);
-
-                ImageView castImage = new ImageView(this);
-                castImage.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 2.6f));
-                castImage.setScaleType(ImageView.ScaleType.FIT_XY);
-
-                if (casts.get(position).getProfilePath() == null) {
-                    Picasso.with(this).load(R.drawable.profile_default).into(castImage);
-                } else {
-                    Picasso.with(this).load(MovieUtils.getCastImageURL(Constants.PROFILE_SIZE_W185, casts.get(position))).into(castImage);
-                }
-
-                TextView castName = new TextView(this);
-                castName.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.4f));
-                castName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                castName.setText(casts.get(position).getName());
-
-                linearLayout.addView(castImage);
-                linearLayout.addView(castName);
-                linearLayout.setOnClickListener(new ActorClicked(casts.get(position), this));
-
-                topBilledCast.addView(linearLayout);
-            }
-        } else {
-            topBilledCast.setVisibility(View.INVISIBLE);
-        }
-    }
+//    /**
+//     * Sets top three cast in a parent linear layout
+//     *
+//     * @param casts    <code>List</code> of Cast objects
+//     * @param position <code>int</code> type value of position in a list
+//     */
+//    private void setTopBilledCast(List<Cast> casts, int position) {
+//        if (casts != null || casts.size() != 0) {
+//            if (position < casts.size()) {
+//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+//                params.setMargins(13, 13, 13, 13);
+//                LinearLayout linearLayout = new LinearLayout(this);
+//                linearLayout.setLayoutParams(params);
+//                linearLayout.setOrientation(LinearLayout.VERTICAL);
+//                linearLayout.setWeightSum(4.0f);
+//
+//                ImageView castImage = new ImageView(this);
+//                castImage.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 2.6f));
+//                castImage.setScaleType(ImageView.ScaleType.FIT_XY);
+//
+//                if (casts.get(position).getProfilePath() == null) {
+//                    Picasso.with(this).load(R.drawable.profile_default).into(castImage);
+//                } else {
+//                    Picasso.with(this).load(MovieUtils.getCastImageURL(Constants.PROFILE_SIZE_W185, casts.get(position))).into(castImage);
+//                }
+//
+//                TextView castName = new TextView(this);
+//                castName.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.4f));
+//                castName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+//                castName.setText(casts.get(position).getName());
+//                castName.setMaxLines(2);
+//
+//                linearLayout.addView(castImage);
+//                linearLayout.addView(castName);
+//                linearLayout.setOnClickListener(new ActorClicked(casts.get(position), this));
+//
+//                topBilledCast.addView(linearLayout);
+//            }
+//        } else {
+//            topBilledCast.setVisibility(View.INVISIBLE);
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
