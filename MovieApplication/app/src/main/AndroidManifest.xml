@@ -18,6 +18,7 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,10 +44,19 @@
             android:name=".activities.FavouriteMoviesActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_favourite_movies"
-            android:parentActivityName=".activities.MainActivity" >
+            android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.TrailerActivity"
+            android:label="@string/title_activity_trailer"
+            android:parentActivityName=".activities.MovieActivity"
+            android:theme="@style/MyMaterialTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.atlantbh.boristomic.movieapplication.activities.MovieActivity" />
         </activity>
     </application>
 

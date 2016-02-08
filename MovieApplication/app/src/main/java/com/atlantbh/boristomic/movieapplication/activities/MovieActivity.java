@@ -1,6 +1,7 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -65,6 +66,7 @@ public class MovieActivity extends AppCompatActivity {
     private MovieAPI api;
     private Realm realm;
     private PosterLoader target;
+    private static Context context;
 
     @Bind(R.id.favourite_icon)
     protected ImageView favouriteIcon;
@@ -101,7 +103,6 @@ public class MovieActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        getLayoutInflater().setFactory(this); // TODO changing pager backdrop video issue
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -111,6 +112,7 @@ public class MovieActivity extends AppCompatActivity {
         setupDrawer();
         target = new PosterLoader(toolbar, indicator);
         realm = Realm.getInstance(this);
+        context = this;
 
         final Intent intent = getIntent();
         final long movieId = intent.getLongExtra(Constants.INTENT_KEY, -1);
@@ -123,9 +125,9 @@ public class MovieActivity extends AppCompatActivity {
             api = RestService.get();
 
             if (tvShow == -1) {
-                showMovie(movieId);
+                showMovie(movieId, Constants.MOVIE);
             } else {
-                showTVShow(movieId);
+                showTVShow(movieId, Constants.TV_SHOWS);
             }
         }
     }
@@ -159,16 +161,11 @@ public class MovieActivity extends AppCompatActivity {
         if (tvShow == -1) {
             toolbar.setTitle(movie.getTitle());
             movieTitleAndYear.setText(movie.getTitle() + " (" + movie.getReleaseDate() + ")");
-            //movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
-
         } else {
             toolbar.setTitle(movie.getName());
             movieTitleAndYear.setText(movie.getName() + " (" + movie.getReleaseDate() + ")");
-            //movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
-
         }
         movieDurationAndGenre.setText(movie.getRuntime() + " | " + movie.getGenres());
-        //Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
         if (movie.getOverview().length() > 250) {
             movieOverview.setText(movie.getOverview().substring(0, 220) + "...");
         } else {
@@ -176,22 +173,13 @@ public class MovieActivity extends AppCompatActivity {
         }
         movieRatingBar.setRating(movie.getVote());
         movieRatingNumber.setText(movie.getVoteAverage());
-        //movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
+        if (movie.getMyRating() > 0) {
+            userRating.setText("My Rating " + String.format("%.1f", movie.getMyRating() / 2));
+        }
         setMovieFavourite(movieId, null);
         defaultBackdrop.setVisibility(View.VISIBLE);
         viewPagerLayout.setVisibility(View.GONE);
         Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
-        return true;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     /**
@@ -200,7 +188,7 @@ public class MovieActivity extends AppCompatActivity {
      *
      * @param movieId <code>long</code> type value of movie id
      */
-    private void showMovie(final long movieId) {
+    private void showMovie(final long movieId, final int type) {
 
         api.findSingleMovie(movieId, new Callback<Movie>() {
             @Override
@@ -237,7 +225,7 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(final Images images, Response response) {
-                setBackdropsWithTrailer(images, movieId);
+                setBackdropsWithTrailer(images, movieId, type);
             }
 
             @Override
@@ -274,7 +262,7 @@ public class MovieActivity extends AppCompatActivity {
      *
      * @param movieId <code>long</code> type value of tv show id
      */
-    private void showTVShow(final long movieId) {
+    private void showTVShow(final long movieId, final int type) {
 
         api.findSingleTvShow(movieId, new Callback<Movie>() {
 
@@ -309,7 +297,7 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Images images, Response response) {
-                setBackdropsWithTrailer(images, movieId);
+                setBackdropsWithTrailer(images, movieId, type);
             }
 
             @Override
@@ -528,37 +516,58 @@ public class MovieActivity extends AppCompatActivity {
         }
     }
 
-    private void setBackdropsWithTrailer(final Images images, final long movieId) {
+    private void setBackdropsWithTrailer(final Images images, final long movieId, final int type) {
         if (images.getBackdrops().size() == 0) {
             defaultBackdrop.setVisibility(View.VISIBLE);
             viewPager.setVisibility(View.GONE);
             Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
         } else {
-            findTrailers(images, movieId);
+            findTrailers(images, movieId, type);
         }
     }
 
-    private void findTrailers(final Images images, final long movieId) {
+    private void findTrailers(final Images images, final long movieId, final int type) {
         final List<Object> objects = new ArrayList<>();
-        api.findMovieVideo(movieId, new Callback<Videos>() {
+        if (type == Constants.MOVIE) {
+            api.findMovieVideo(movieId, new Callback<Videos>() {
 
-            @Override
-            public void success(Videos videos, Response response) {
-                Trailer t = MovieUtils.getMovieYouTubeTrailer(videos);
-                if (t != null) {
-                    objects.add(t);
+                @Override
+                public void success(Videos videos, Response response) {
+                    Trailer t = MovieUtils.getMovieYouTubeTrailer(videos);
+                    if (t != null) {
+                        objects.add(t);
+                    }
+                    objects.addAll(images.getBackdrops());
+                    setupPagerWithBackdrops(objects);
                 }
-                objects.addAll(images.getBackdrops());
-                setupPagerWithBackdrops(objects);
-            }
 
-            @Override
-            public void failure(RetrofitError error) {
-                objects.addAll(images.getBackdrops());
-                setupPagerWithBackdrops(objects);
-                Log.e(LOG_TAG, "Failed to load movie video", error);
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    objects.addAll(images.getBackdrops());
+                    setupPagerWithBackdrops(objects);
+                    Log.e(LOG_TAG, "Failed to load movie video", error);
+                }
+            });
+        } else if (type == Constants.TV_SHOWS) {
+            api.findTvShowVideo(movieId, new Callback<Videos>() {
+                @Override
+                public void success(Videos videos, Response response) {
+                    Trailer t = MovieUtils.getMovieYouTubeTrailer(videos);
+                    if (t != null) {
+                        objects.add(t);
+                    }
+                    objects.addAll(images.getBackdrops());
+                    setupPagerWithBackdrops(objects);
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    objects.addAll(images.getBackdrops());
+                    setupPagerWithBackdrops(objects);
+                    Log.e(LOG_TAG, "Failed to load movie video", error);
+                }
+            });
+        }
     }
 
     private void setupPagerWithBackdrops(List<Object> objects) {
@@ -573,5 +582,25 @@ public class MovieActivity extends AppCompatActivity {
             realm.close();
         }
         super.onDestroy();
+    }
+
+    /**
+     * Returns context for static use
+     *
+     * @return
+     */
+    public static Context getContext() {
+        return context;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

@@ -34,5 +34,6 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="title_activity_favourite_movies">Favourite Movies</string>
+    <string name="title_activity_trailer">TrailerActivity</string>
 
 </resources>
