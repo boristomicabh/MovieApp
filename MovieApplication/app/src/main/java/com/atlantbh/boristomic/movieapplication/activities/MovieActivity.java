@@ -166,11 +166,8 @@ public class MovieActivity extends AppCompatActivity {
             movieTitleAndYear.setText(movie.getName() + " (" + movie.getReleaseDate() + ")");
         }
         movieDurationAndGenre.setText(movie.getRuntime() + " | " + movie.getGenres());
-        if (movie.getOverview().length() > 250) {
-            movieOverview.setText(movie.getOverview().substring(0, 220) + "...");
-        } else {
-            movieOverview.setText(movie.getOverview());
-        }
+        movieOverview.setText(movie.getOverview());
+        setupOverviewExpand();
         movieRatingBar.setRating(movie.getVote());
         movieRatingNumber.setText(movie.getVoteAverage());
         if (movie.getMyRating() > 0) {
@@ -429,6 +426,10 @@ public class MovieActivity extends AppCompatActivity {
      */
     private void setMovieOverview(Movie movie) {
         movieOverview.setText(movie.getOverview());
+        setupOverviewExpand();
+    }
+
+    private void setupOverviewExpand() {
         movieOverview.setOnClickListener(new View.OnClickListener() {
             boolean isClicked = true;
 
