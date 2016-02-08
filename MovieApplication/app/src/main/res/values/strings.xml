@@ -8,15 +8,15 @@
     <string name="most_popular_tvshows_title" translatable="true">Most popular TV Shows</string>
     <string name="title_activity_movie"></string>
     <string name="title_activity_actor"></string>
-    <string name="user_rating_title" translatable="true">My \r\nRating</string>
-    <string name="user_rating_value" translatable="true">Not Yet Rated</string>
-    <string name="movie_cast">Top Billed Cast</string>
-    <string name="movie_gallery_title">Gallery</string>
+    <string name="user_rating_value" translatable="true">Not Rated</string>
+    <string name="movie_cast" translatable="true">Cast</string>
+    <string name="reviews_title" translatable="true">Reviews</string>
+    <string name="actor_movie_list_title" translatable="true">Known For</string>
+    <string name="actor_tv_shows_list_title" translatable="true">TV Shows</string>
     <string name="search_title" translatable="true">Search</string>
+
     <string name="favourite_remove_button" translatable="true">Remove</string>
     <string name="trailer_title" translatable="true">See Trailer</string>
-    <string name="reviews_title" translatable="true">Read Reviews</string>
-    <string name="clickable_cast_more" translatable="true">See More Cast</string>
 
     <!-- Drawer menu items title -->
     <string-array name="drawer_menu_titles">

@@ -3,7 +3,6 @@ package com.atlantbh.boristomic.movieapplication.holders;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -57,7 +56,7 @@ public class MovieHolder extends RecyclerView.ViewHolder implements View.OnClick
     }
 
     /**
-     * Method used to bind one element to RecyclerView list
+     * Method used to bindCast one element to RecyclerView list
      *
      * @param movie <code>Movie</code> type object
      */
@@ -68,6 +67,9 @@ public class MovieHolder extends RecyclerView.ViewHolder implements View.OnClick
         mMovieTitle.setText(MovieUtils.getTitleWithYear(temp, listType));
         mMovieRatingStars.setRating(MovieUtils.getMovieFloatRating(movie));
         mMovieRatingNumber.setText(MovieUtils.getMovieStringRating(movie));
+        if(MovieUtils.getTitleWithYear(temp, listType).length() > 20) {
+            mMovieOverview.setMaxLines(4);
+        }
         mMovieOverview.setText(MovieUtils.getShorterOverview(movie));
         if (temp.getPosterPath() == null) {
             Picasso.with(context).load(R.drawable.poster_default).into(mMoviePoster);

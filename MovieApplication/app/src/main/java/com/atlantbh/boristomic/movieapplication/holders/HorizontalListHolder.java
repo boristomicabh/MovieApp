@@ -20,7 +20,7 @@ import butterknife.ButterKnife;
 /**
  * Created by boristomic on 03/02/16.
  */
-public class CastListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class HorizontalListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     @Bind(R.id.actor_image_list)
     protected ImageView actorImage;
@@ -29,22 +29,43 @@ public class CastListHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     private Context context;
     private long castId;
+    private int type;
 
-    public CastListHolder(View itemView, Context context) {
+    public HorizontalListHolder(View itemView, Context context, int type) {
         super(itemView);
         this.context = context;
+        this.type = type;
         ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(this);
+        if (this.type == Constants.CAST) {
+            itemView.setOnClickListener(this);
+        }
     }
 
-    public void bind(Cast cast) {
+    public void bindCast(Cast cast, int type) {
         this.castId = cast.getId();
-        if (cast.getProfilePath() == null) {
-            Picasso.with(context).load(R.drawable.profile_default).into(actorImage);
+        if (type == Constants.MOVIE || type == Constants.TV_SHOWS) {
+            bindMovieOrTVShow(cast, type);
+        } else {
+            if (cast.getProfilePath() == null) {
+                Picasso.with(context).load(R.drawable.profile_default).into(actorImage);
+            } else {
+                Picasso.with(context).load(MovieUtils.getCastImageURL(Constants.PROFILE_SIZE_W185, cast)).into(actorImage);
+            }
+            actorName.setText(cast.getName());
+        }
+    }
+
+    public void bindMovieOrTVShow(Cast cast, int type) {
+        if (type == Constants.MOVIE) {
+            actorName.setText(cast.getOriginalTitle());
+        } else {
+            actorName.setText(cast.getName());
+        }
+        if (cast.getPosterPath() == null) {
+            Picasso.with(context).load(R.drawable.poster_default).into(actorImage);
         } else {
             Picasso.with(context).load(MovieUtils.getCastImageURL(Constants.PROFILE_SIZE_W185, cast)).into(actorImage);
         }
-        actorName.setText(cast.getName());
     }
 
     @Override

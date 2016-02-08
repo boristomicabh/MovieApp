@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/view_pager_layout"
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <!-- Backdrop gallery -->
+            <android.support.v4.view.ViewPager
+                android:id="@+id/view_pager_backdrop_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+
+            <com.viewpagerindicator.CirclePageIndicator
+                android:id="@+id/pager_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/view_pager_backdrop_image"
+                android:layout_marginBottom="1dp"
+                android:padding="1dp" />
+
+        </RelativeLayout>
+
+        <!-- Default backdrop image -->
+        <ImageView
+            android:id="@+id/default_backdrop_image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <!-- Actor image and bio -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <ImageView
+                android:id="@+id/actor_poster"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3.5"
+                android:scaleType="fitXY" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_weight="6.5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/actor_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/textHighlight"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/actor_year_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/actor_biography"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:maxLines="5"
+                    android:textColor="@color/textLighter"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/actor_movies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:text="@string/actor_movie_list_title"
+            android:textColor="@color/textLighter" />
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/actor_movies_list"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp" />
+
+        <TextView
+            android:id="@+id/actor_tvshows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/actor_tv_shows_list_title"
+            android:textColor="@color/textLighter" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/actor_tv_shows_list"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp" />
+
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

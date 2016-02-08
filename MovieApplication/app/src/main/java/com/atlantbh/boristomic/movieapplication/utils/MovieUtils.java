@@ -3,7 +3,6 @@ package com.atlantbh.boristomic.movieapplication.utils;
 import com.atlantbh.boristomic.movieapplication.models.rest.Actor;
 import com.atlantbh.boristomic.movieapplication.models.rest.Backdrop;
 import com.atlantbh.boristomic.movieapplication.models.rest.Cast;
-import com.atlantbh.boristomic.movieapplication.models.rest.Genre;
 import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
 import com.atlantbh.boristomic.movieapplication.models.rest.Trailer;
 import com.atlantbh.boristomic.movieapplication.models.rest.Videos;
@@ -90,6 +89,15 @@ public class MovieUtils {
         return null;
     }
 
+    public static Trailer getMovieYouTubeTrailer(Videos videos) {
+        for (Trailer t : videos.getResults()) {
+            if (Constants.YOUTUBE.equals(t.getSite())) {
+                return t;
+            }
+        }
+        return null;
+    }
+
     private static String getThisMonthDate(int month, int day) {
         StringBuilder result = new StringBuilder();
         result.append(getMonthForInt(month));
@@ -161,6 +169,13 @@ public class MovieUtils {
 
     public static String getMovieStringRating(Movie movie) {
         return String.format("%.1f", movie.getVoteAverage() / 2);
+    }
+
+    public static String getMovieName(Movie movie) {
+        if (movie.getTitle() != null) {
+            return movie.getTitle();
+        }
+        return movie.getName();
     }
 
     public static String getGenreNames(Movie movie) {

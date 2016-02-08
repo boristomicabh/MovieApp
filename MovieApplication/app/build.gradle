@@ -36,4 +36,5 @@ dependencies {
     compile 'io.realm:realm-android:0.87.3'
     compile 'com.android.support:palette-v7:23.1.1'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+    compile files('libs/YouTubeAndroidPlayerApi.jar')
 }

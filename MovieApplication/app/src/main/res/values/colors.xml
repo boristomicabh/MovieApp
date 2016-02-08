@@ -12,4 +12,7 @@
     <color name="colorGray">#D6D6D6</color>
     <color name="colorLightGray">#E6E6E6</color>
     <color name="colorWhite">#ffffff</color>
+
+    <color name="textHighlight">#1D1D26</color>
+    <color name="textLighter">#8E8E92</color>
 </resources>

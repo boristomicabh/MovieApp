@@ -5,10 +5,10 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.viewpagerindicator.CirclePageIndicator;
 
 /**
  * Created by boristomic on 02/02/16.
@@ -17,19 +17,17 @@ public class PosterLoader implements Target {
 
     private final String LOG_TAG = PosterLoader.class.getSimpleName();
 
-    private ImageView posterImage;
     private Toolbar toolbar;
-    private static int vibrantColor;
+    private CirclePageIndicator indicator;
 
-    public PosterLoader(ImageView posterImage, Toolbar toolbar) {
-        this.posterImage = posterImage;
+    public PosterLoader(Toolbar toolbar, CirclePageIndicator indicator) {
         this.toolbar = toolbar;
+        this.indicator = indicator;
     }
 
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
         if (bitmap != null) {
-            posterImage.setImageBitmap(bitmap);
             Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
@@ -37,12 +35,12 @@ public class PosterLoader implements Target {
                         Palette.Swatch color = palette.getVibrantSwatch();
                         Palette.Swatch color2 = palette.getMutedSwatch();
                         if (color != null) {
-                            vibrantColor = color.getRgb();
                             toolbar.setBackgroundColor(color.getRgb());
+                            indicator.setFillColor(color.getRgb());
                         } else {
                             if (color2 != null) {
-                                vibrantColor = color2.getRgb();
                                 toolbar.setBackgroundColor(color2.getRgb());
+                                indicator.setFillColor(color2.getRgb());
                             }
                         }
                     }
@@ -58,10 +56,7 @@ public class PosterLoader implements Target {
 
     @Override
     public void onPrepareLoad(Drawable placeHolderDrawable) {
-        Log.e(LOG_TAG, "Failed to load bitmap onPrepareLoad" );
+        Log.e(LOG_TAG, "Failed to load bitmap onPrepareLoad");
     }
 
-    public static int vibrantColor() {
-        return vibrantColor;
-    }
 }

@@ -5,6 +5,7 @@ import com.atlantbh.boristomic.movieapplication.models.rest.ActorImages;
 import com.atlantbh.boristomic.movieapplication.models.rest.Credits;
 import com.atlantbh.boristomic.movieapplication.models.rest.Images;
 import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.MovieReviews;
 import com.atlantbh.boristomic.movieapplication.models.rest.MoviesResponse;
 import com.atlantbh.boristomic.movieapplication.models.rest.Videos;
 import com.atlantbh.boristomic.movieapplication.utils.Constants;
@@ -89,5 +90,7 @@ public interface MovieAPI {
     @GET(Constants.URL_SEARCH_MOVIE)
     void findAnyMovie(@Query(Constants.QUERY_QUERY) String movieName, Callback<MoviesResponse> callback);
 
+    @GET(Constants.URL_MOVIE_REVIEWS)
+    void findMovieReviews(@Path(Constants.PATH_ID) long id, Callback<MovieReviews> callback);
 
 }

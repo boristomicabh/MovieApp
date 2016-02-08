@@ -17,7 +17,8 @@ public class Constants {
 
     private static final String LOG_TAG = Constants.class.getSimpleName();
 
-    public final static String API_KEY = getStringFromFile("api.key");
+    public static final String API_KEY = getStringFromFile("api.key");
+    public static final String YOU_TUBE_API_KEY = getStringFromFile("youtube.api.key");
 
     public static final String URL_MOVIE_ID = "/movie/{id}";
     public static final String URL_TV_ID = "/tv/{id}";
@@ -35,6 +36,8 @@ public class Constants {
     public static final String URL_TV_VIDEOS = "/tv/{id}/videos";
     public static final String URL_MOVIE_IMAGES = "/movie/{id}/images";
     public static final String URL_TV_IMAGES = "/tv/{id}/images";
+    public static final String URL_MOVIE_REVIEWS = "/movie/{id}/reviews";
+    public static final String URL_TV_REVIEWS = "/tv/{id}/reviews";
     public static final String URL_ACTOR_TAGGED_IMAGES = "/person/{id}/tagged_images";
     public static final String URL_ACTOR_MOVIE_CREDITS = "/person/{id}/movie_credits";
     public static final String URL_ACTOR_TV_CREDITS = "/person/{id}/tv_credits";
@@ -87,6 +90,7 @@ public class Constants {
 
     public static final String YOUTUBE = "YouTube";
     public static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+    public static final String YOUTUBE_EMBED_URL = "http://www.youtube.com/embed/";
     public static final String MOVIE_REVIEW_URL_BASE = "https://www.themoviedb.org/movie/";
     public static final String MOVIE_REVIEW_URL_EXTRA = "/reviews";
     public static final String TV_SHOW_INFO_URL_BASE = "https://www.themoviedb.org/tv/";

@@ -9,7 +9,6 @@ import com.google.gson.annotations.SerializedName;
 public class Cast {
 
 
-
     @SerializedName("cast_id")
     @Expose
     private int castId;
@@ -42,126 +41,98 @@ public class Cast {
     private String posterPath;
 
     /**
-     *
-     * @return
-     * The castId
+     * @return The castId
      */
     public int getCastId() {
         return castId;
     }
 
     /**
-     *
-     * @param castId
-     * The cast_id
+     * @param castId The cast_id
      */
     public void setCastId(int castId) {
         this.castId = castId;
     }
 
     /**
-     *
-     * @return
-     * The character
+     * @return The character
      */
     public String getCharacter() {
         return character;
     }
 
     /**
-     *
-     * @param character
-     * The character
+     * @param character The character
      */
     public void setCharacter(String character) {
         this.character = character;
     }
 
     /**
-     *
-     * @return
-     * The creditId
+     * @return The creditId
      */
     public String getCreditId() {
         return creditId;
     }
 
     /**
-     *
-     * @param creditId
-     * The credit_id
+     * @param creditId The credit_id
      */
     public void setCreditId(String creditId) {
         this.creditId = creditId;
     }
 
     /**
-     *
-     * @return
-     * The id
+     * @return The id
      */
     public long getId() {
         return id;
     }
 
     /**
-     *
-     * @param id
-     * The id
+     * @param id The id
      */
     public void setId(long id) {
         this.id = id;
     }
 
     /**
-     *
-     * @return
-     * The name
+     * @return The name
      */
     public String getName() {
         return name;
     }
 
     /**
-     *
-     * @param name
-     * The name
+     * @param name The name
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     *
-     * @return
-     * The order
+     * @return The order
      */
     public int getOrder() {
         return order;
     }
 
     /**
-     *
-     * @param order
-     * The order
+     * @param order The order
      */
     public void setOrder(int order) {
         this.order = order;
     }
 
     /**
-     *
-     * @return
-     * The profilePath
+     * @return The profilePath
      */
     public Object getProfilePath() {
         return profilePath;
     }
 
     /**
-     *
-     * @param profilePath
-     * The profile_path
+     * @param profilePath The profile_path
      */
     public void setProfilePath(Object profilePath) {
         this.profilePath = profilePath;
@@ -176,17 +147,14 @@ public class Cast {
     }
 
     /**
-     *  @return
-     *  The posterPath
-    */
+     * @return The posterPath
+     */
     public String getPosterPath() {
         return posterPath;
     }
 
     /**
-     *
-     * @param posterPath
-     * The poster_path
+     * @param posterPath The poster_path
      */
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;

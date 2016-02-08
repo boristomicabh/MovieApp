@@ -4,21 +4,20 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
 import com.atlantbh.boristomic.movieapplication.adapters.DrawerAdapter;
@@ -28,6 +27,8 @@ import com.atlantbh.boristomic.movieapplication.models.MovieDB;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.Realm;
 
 public class FavouriteMoviesActivity extends AppCompatActivity {
 
@@ -43,6 +44,7 @@ public class FavouriteMoviesActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     private List<MovieDB> movies;
+    private FavouriteMovieAdapter favouriteMovieAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +69,34 @@ public class FavouriteMoviesActivity extends AppCompatActivity {
 
         movies = MovieDB.findAllFavouriteMovies(this);
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.favourite_movies_list);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new FavouriteMovieAdapter(movies, this));
+        favouriteMovieAdapter = new FavouriteMovieAdapter(movies, this);
+        recyclerView.setAdapter(favouriteMovieAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            MovieDB temp = favouriteMovieAdapter.getMovie(viewHolder.getAdapterPosition());
+            Realm realm = Realm.getInstance(FavouriteMoviesActivity.this);
+            MovieDB.updateMovieFavourite(realm, temp);
+            favouriteMovieAdapter.updateUI();
+            if (temp.getName() == null) {
+                Toast.makeText(FavouriteMoviesActivity.this, temp.getTitle() + " removed from favourites.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(FavouriteMoviesActivity.this, temp.getName() + " removed from favourites.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     private class SlideMenuClickListener implements
             ListView.OnItemClickListener {

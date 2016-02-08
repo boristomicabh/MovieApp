@@ -1,136 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".activities.ActorActivity">
+    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="wrap_content"
                 android:background="?attr/colorPrimary"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="@color/colorGray"/>
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+        </android.support.design.widget.AppBarLayout>
 
 
-    <ScrollView
-        android:layout_width="match_parent"
+        <!-- Content of actor view -->
+        <include layout="@layout/activity_actor_content" />
+
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <!--Drawer list-->
+    <ListView
+        android:id="@+id/drawer_list"
+        android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
+        android:layout_gravity="start"
+        android:background="@color/colorWhite"
+        android:choiceMode="singleChoice"
+        android:divider="@color/colorGray"
+        android:dividerHeight="1dp"
+        android:listSelector="@drawable/list_selector" />
+
+</android.support.v4.widget.DrawerLayout>
 
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/actor_first_image"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="centerInside" />
-
-            <TextView
-                android:id="@+id/actor_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/actor_first_image"
-                android:paddingLeft="@dimen/left_padding_movie_feed"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/actor_year_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/actor_name"
-                android:paddingLeft="@dimen/left_padding_movie_feed"/>
-
-
-            <ImageView
-                android:id="@+id/actor_poster"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/actor_year_location"
-                android:paddingLeft="@dimen/left_padding_movie_feed" />
-
-            <TextView
-                android:id="@+id/actor_biography"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/actor_year_location"
-                android:layout_toEndOf="@id/actor_poster"
-                android:padding="5dp"
-                android:layout_alignTop="@id/actor_poster"
-                android:layout_alignBottom="@id/actor_poster"/>
-
-
-
-            <TextView
-                android:id="@+id/appeared_in"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/left_padding_movie_feed"
-                android:textStyle="bold"
-                android:text="Actor Appeared In"/>
-
-            <TextView
-                android:id="@+id/actor_movies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/appeared_in"
-                android:paddingLeft="@dimen/left_padding_movie_feed"
-                android:text="Movies"/>
-
-            <mobi.parchment.widget.adapterview.listview.ListView xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
-                android:id="@+id/actor_movies_list"
-                android:layout_width="wrap_content"
-                android:layout_height="160dp"
-                android:layout_below="@id/actor_movies"
-                android:clipToPadding="false"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="insideInset"
-                android:scrollbars="horizontal"
-                parchment:cellSpacing="5dp"
-                parchment:orientation="horizontal"
-                parchment:snapPosition="start"
-                parchment:snapToPosition="true"/>
-
-            <TextView
-                android:id="@+id/actor_tvshows"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/actor_movies_list"
-                android:paddingLeft="@dimen/left_padding_movie_feed"
-                android:text="TV Shows"/>
-
-            <mobi.parchment.widget.adapterview.listview.ListView xmlns:parchment="http://schemas.android.com/apk/res/com.atlantbh.boristomic.movieapplication"
-                android:id="@+id/actor_tv_shows_list"
-                android:layout_width="wrap_content"
-                android:layout_height="160dp"
-                android:layout_below="@id/actor_tvshows"
-                android:clipToPadding="false"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarStyle="insideInset"
-                android:scrollbars="horizontal"
-                parchment:cellSpacing="5dp"
-                parchment:orientation="horizontal"
-                parchment:snapPosition="start"
-                parchment:snapToPosition="true" />
-
-        </RelativeLayout>
-
-    </ScrollView>
-
-
-    </RelativeLayout>
-
-
-
-</FrameLayout>

@@ -1,5 +1,6 @@
 package com.atlantbh.boristomic.movieapplication.activities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -13,28 +14,29 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.RatingBar;
-import android.widget.TableLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atlantbh.boristomic.movieapplication.R;
-import com.atlantbh.boristomic.movieapplication.adapters.CastListAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.DrawerAdapter;
+import com.atlantbh.boristomic.movieapplication.adapters.HorizontalListAdapter;
 import com.atlantbh.boristomic.movieapplication.adapters.SlideshowPagerAdapter;
-import com.atlantbh.boristomic.movieapplication.listeners.ActorClicked;
 import com.atlantbh.boristomic.movieapplication.listeners.DrawerMenuItemClicked;
-import com.atlantbh.boristomic.movieapplication.listeners.MovieReviewClicked;
-import com.atlantbh.boristomic.movieapplication.listeners.MovieVideosClicked;
 import com.atlantbh.boristomic.movieapplication.models.DrawerItem;
 import com.atlantbh.boristomic.movieapplication.models.MovieDB;
-import com.atlantbh.boristomic.movieapplication.models.rest.Cast;
 import com.atlantbh.boristomic.movieapplication.models.rest.Credits;
 import com.atlantbh.boristomic.movieapplication.models.rest.Images;
 import com.atlantbh.boristomic.movieapplication.models.rest.Movie;
+import com.atlantbh.boristomic.movieapplication.models.rest.MovieReviews;
+import com.atlantbh.boristomic.movieapplication.models.rest.Review;
+import com.atlantbh.boristomic.movieapplication.models.rest.Trailer;
 import com.atlantbh.boristomic.movieapplication.models.rest.Videos;
 import com.atlantbh.boristomic.movieapplication.services.MovieAPI;
 import com.atlantbh.boristomic.movieapplication.services.RestService;
@@ -57,16 +59,12 @@ import retrofit.client.Response;
 
 public class MovieActivity extends AppCompatActivity {
 
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private final String LOG_TAG = MovieActivity.class.getSimpleName();
 
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
-    private String[] drawerItemTitles;
-    private TypedArray drawerItemIcons;
-    private List<DrawerItem> drawerItems;
-    private DrawerAdapter drawerAdapter;
-
+    private Toolbar toolbar;
     private MovieAPI api;
+    private Realm realm;
+    private PosterLoader target;
 
     @Bind(R.id.favourite_icon)
     protected ImageView favouriteIcon;
@@ -74,20 +72,12 @@ public class MovieActivity extends AppCompatActivity {
     protected TextView movieTitleAndYear;
     @Bind(R.id.movie_duration_genre)
     protected TextView movieDurationAndGenre;
-    @Bind(R.id.movie_poster)
-    protected ImageView moviePoster;
     @Bind(R.id.movie_overview)
     protected TextView movieOverview;
-    @Bind(R.id.movie_video_link)
-    protected ImageView movieVideo;
     @Bind(R.id.movie_rating_bar)
     protected RatingBar movieRatingBar;
     @Bind(R.id.movie_rating_number)
     protected TextView movieRatingNumber;
-    @Bind(R.id.movie_total_votes)
-    protected TextView movieTotalVotes;
-    @Bind(R.id.movie_reviews_link)
-    protected ImageView movieReviewsLink;
     @Bind(R.id.view_pager_backdrop_image)
     protected ViewPager viewPager;
     @Bind(R.id.default_backdrop_image)
@@ -96,17 +86,12 @@ public class MovieActivity extends AppCompatActivity {
     protected RecyclerView castList;
     @Bind(R.id.pager_indicator)
     protected CirclePageIndicator indicator;
-
-//    @Bind(R.id.top_billed_actors_layout)
-//    protected LinearLayout topBilledCast;
-//    @Bind(R.id.more_cast_link)
-//    protected TextView moreCastLink;
-//    @Bind(R.id.more_actors_layout)
-//    protected LinearLayout moreCastLayout;
-
-    private Toolbar toolbar;
-    private Realm realm;
-    private PosterLoader target;
+    @Bind(R.id.reviews_layout)
+    protected LinearLayout reviewsLayout;
+    @Bind(R.id.view_pager_layout)
+    protected RelativeLayout viewPagerLayout;
+    @Bind(R.id.user_rating_title)
+    protected TextView userRating;
 
     /**
      * Sets layout activity_movie.xml, toolbar, rest service and butter knife to find all views.
@@ -116,32 +101,20 @@ public class MovieActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        getLayoutInflater().setFactory(this); // TODO changing pager backdrop video issue
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ButterKnife.bind(MovieActivity.this);
-        target = new PosterLoader(moviePoster, toolbar);
-
+        setupDrawer();
+        target = new PosterLoader(toolbar, indicator);
         realm = Realm.getInstance(this);
 
         final Intent intent = getIntent();
         final long movieId = intent.getLongExtra(Constants.INTENT_KEY, -1);
         final int tvShow = intent.getIntExtra(Constants.INTENT_KEY_TYPE_TV_SHOW, -1);
-
-        drawerItemTitles = getResources().getStringArray(R.array.drawer_menu_titles);
-        drawerItemIcons = getResources().obtainTypedArray(R.array.drawer_menu_icons);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.drawer_list);
-        drawerItems = new ArrayList<>();
-        drawerItems.add(new DrawerItem(drawerItemTitles[0], drawerItemIcons.getResourceId(0, -1)));
-        drawerItems.add(new DrawerItem(drawerItemTitles[1], drawerItemIcons.getResourceId(1, -1)));
-        drawerItems.add(new DrawerItem(drawerItemTitles[2], drawerItemIcons.getResourceId(2, -1)));
-        drawerItemIcons.recycle();
-        drawerAdapter = new DrawerAdapter(drawerItems);
-        drawerList.setAdapter(drawerAdapter);
-        drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getBaseContext()));
 
         if (!Connection.isConnected(this)) {
             populateMovieDataLight(movieId, tvShow);
@@ -157,21 +130,45 @@ public class MovieActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Setups drawer list with titles and icons, also adds a listener to each item
+     */
+    private void setupDrawer() {
+        String[] drawerItemTitles = getResources().getStringArray(R.array.drawer_menu_titles);
+        TypedArray drawerItemIcons = getResources().obtainTypedArray(R.array.drawer_menu_icons);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ListView drawerList = (ListView) findViewById(R.id.drawer_list);
+        List<DrawerItem> drawerItems = new ArrayList<>();
+        drawerItems.add(new DrawerItem(drawerItemTitles[0], drawerItemIcons.getResourceId(0, -1)));
+        drawerItems.add(new DrawerItem(drawerItemTitles[1], drawerItemIcons.getResourceId(1, -1)));
+        drawerItems.add(new DrawerItem(drawerItemTitles[2], drawerItemIcons.getResourceId(2, -1)));
+        drawerItemIcons.recycle();
+        DrawerAdapter drawerAdapter = new DrawerAdapter(drawerItems);
+        drawerList.setAdapter(drawerAdapter);
+        drawerList.setOnItemClickListener(new DrawerMenuItemClicked(drawerLayout, getBaseContext()));
+    }
+
+    /**
+     * Populates movie data from database when there is no connection
+     *
+     * @param movieId <code>long</code> value of movie id
+     * @param tvShow  <colde>int</colde> value if item is tv show
+     */
     private void populateMovieDataLight(long movieId, int tvShow) {
         MovieDB movie = MovieDB.findMovieById(realm, movieId);
         if (tvShow == -1) {
             toolbar.setTitle(movie.getTitle());
             movieTitleAndYear.setText(movie.getTitle() + " (" + movie.getReleaseDate() + ")");
-            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
+            //movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
 
         } else {
             toolbar.setTitle(movie.getName());
             movieTitleAndYear.setText(movie.getName() + " (" + movie.getReleaseDate() + ")");
-            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
+            //movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
 
         }
         movieDurationAndGenre.setText(movie.getRuntime() + " | " + movie.getGenres());
-        Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
+        //Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
         if (movie.getOverview().length() > 250) {
             movieOverview.setText(movie.getOverview().substring(0, 220) + "...");
         } else {
@@ -179,10 +176,10 @@ public class MovieActivity extends AppCompatActivity {
         }
         movieRatingBar.setRating(movie.getVote());
         movieRatingNumber.setText(movie.getVoteAverage());
-        movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
+        //movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
         setMovieFavourite(movieId, null);
         defaultBackdrop.setVisibility(View.VISIBLE);
-        viewPager.setVisibility(View.GONE);
+        viewPagerLayout.setVisibility(View.GONE);
         Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
     }
 
@@ -206,41 +203,25 @@ public class MovieActivity extends AppCompatActivity {
     private void showMovie(final long movieId) {
 
         api.findSingleMovie(movieId, new Callback<Movie>() {
-
-                    @Override
-                    public void success(Movie movie, Response response) {
-                        populateMovieData(movie, Constants.MOVIE, movieId);
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        Log.e(LOG_TAG, "Failed to load single movie", error);
-                    }
-                }
-        );
-
-        api.findMovieVideo(movieId, new Callback<Videos>() {
-
             @Override
-            public void success(Videos videos, Response response) {
-                final String trailerKey = MovieUtils.getMovieTrailer(videos);
-                movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
+            public void success(Movie movie, Response response) {
+                populateMovieData(movie, Constants.MOVIE, movieId);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.e(LOG_TAG, "Failed to load movie video", error);
+                Log.e(LOG_TAG, "Failed to load single movie", error);
             }
         });
 
+
+        /**
+         * Finds cast of movie and populates data in horizontal recycler view
+         */
         api.findMovieCast(movieId, new Callback<Credits>() {
             @Override
             public void success(Credits credits, Response response) {
-                castList.setLayoutManager(new LinearLayoutManager(MovieActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                castList.setAdapter(new CastListAdapter(credits.getCast(), MovieActivity.this));
-//                for (int i = 0; i < 3; i++) {
-//                    setTopBilledCast(credits.getCast(), i);
-//                }
+                setCast(credits);
             }
 
             @Override
@@ -249,20 +230,14 @@ public class MovieActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         * Finds movie images and if successful finds youtube trailer
+         */
         api.findMovieBackdrops(movieId, new Callback<Images>() {
 
             @Override
-            public void success(Images images, Response response) {
-                if (images.getBackdrops().size() == 0) {
-                    defaultBackdrop.setVisibility(View.VISIBLE);
-                    viewPager.setVisibility(View.GONE);
-                    Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
-                } else {
-                    SlideshowPagerAdapter slideshowPagerAdapter = new SlideshowPagerAdapter(MovieActivity.this, images.getBackdrops());
-                    viewPager.setAdapter(slideshowPagerAdapter);
-                    indicator.setViewPager(viewPager);
-//                    indicator.setFillColor(PosterLoader.vibrantColor());
-                }
+            public void success(final Images images, Response response) {
+                setBackdropsWithTrailer(images, movieId);
             }
 
             @Override
@@ -271,6 +246,26 @@ public class MovieActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         * Finds movie reviews
+         */
+        api.findMovieReviews(movieId, new Callback<MovieReviews>() {
+            @Override
+            public void success(MovieReviews movieReviews, Response response) {
+                setReviews(movieReviews.getResults());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(LOG_TAG, "Failed to load movie reviews", error);
+            }
+        });
+
+    }
+
+    private void setCast(Credits credits) {
+        castList.setLayoutManager(new LinearLayoutManager(MovieActivity.this, LinearLayoutManager.HORIZONTAL, false));
+        castList.setAdapter(new HorizontalListAdapter(credits.getCast(), Constants.CAST, MovieActivity.this));
     }
 
     /**
@@ -294,28 +289,14 @@ public class MovieActivity extends AppCompatActivity {
             }
         });
 
-        api.findTvShowVideo(movieId, new Callback<Videos>() {
-
-            @Override
-            public void success(Videos videos, Response response) {
-                final String trailerKey = MovieUtils.getMovieTrailer(videos);
-                movieVideo.setOnClickListener(new MovieVideosClicked(trailerKey, MovieActivity.this));
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e(LOG_TAG, "Failed to load tv show video", error);
-            }
-        });
-
-
+        /**
+         * Finds cast of tv show and populates data in horizontal recycler view
+         */
         api.findTvShowCast(movieId, new Callback<Credits>() {
 
             @Override
             public void success(Credits credits, Response response) {
-//                for (int i = 0; i < 3; i++) {
-//                    setTopBilledCast(credits.getCast(), i);
-//                }
+                setCast(credits);
             }
 
             @Override
@@ -328,14 +309,7 @@ public class MovieActivity extends AppCompatActivity {
 
             @Override
             public void success(Images images, Response response) {
-                if (images.getBackdrops().size() == 0) {
-                    defaultBackdrop.setVisibility(View.VISIBLE);
-                    viewPager.setVisibility(View.GONE);
-                    Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
-                } else {
-                    SlideshowPagerAdapter slideshowPagerAdapter = new SlideshowPagerAdapter(MovieActivity.this, images.getBackdrops());
-                    viewPager.setAdapter(slideshowPagerAdapter);
-                }
+                setBackdropsWithTrailer(images, movieId);
             }
 
             @Override
@@ -356,7 +330,6 @@ public class MovieActivity extends AppCompatActivity {
     private void populateMovieData(final Movie movie, final int type, final long movieId) {
         setToolbarTitle(movie, type);
         setMovieTitleAndYear(movie, type);
-        setMovieReviewsLink(movie, type, movieId);
         setMovieDurationAndGenre(movie);
         setMoviePosterImage(movie);
         setMovieOverview(movie);
@@ -364,6 +337,47 @@ public class MovieActivity extends AppCompatActivity {
         setMovieTotalRatingNumberAndVoteCount(movie);
         setMovieFavourite(movieId, movie);
 
+        userRating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                show(movie);
+            }
+        });
+
+    }
+
+    public void show(final Movie movie) {
+        final Dialog d = new Dialog(MovieActivity.this);
+        d.setTitle("Rate " + toolbar.getTitle());
+        d.setContentView(R.layout.rating_dialog);
+        final Button rate = (Button) d.findViewById(R.id.rate_button);
+        final Button cancel = (Button) d.findViewById(R.id.cancel_button);
+        final NumberPicker np = (NumberPicker) d.findViewById(R.id.number_picker);
+        np.setMaxValue(10);
+        np.setMinValue(1);
+        np.setWrapSelectorWheel(false);
+        rate.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                userRating.setText("My Rating " + String.format("%.1f", (float) np.getValue() / 2));
+                MovieDB temp = MovieDB.findMovieById(realm, movie.getId());
+                if (temp == null) {
+                    MovieDB.SaveNewMoveOnRating(realm, movie, np.getValue());
+                } else {
+                    MovieDB.updateMovieRating(realm, temp, np.getValue());
+                }
+                d.dismiss();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+            }
+        });
+        d.show();
     }
 
     private void setMovieFavourite(final long movieId, final Movie movie) {
@@ -372,6 +386,9 @@ public class MovieActivity extends AppCompatActivity {
         if (movieDB != null) {
             if (movieDB.isFavourite()) {
                 favouriteIcon.setBackgroundResource(R.drawable.ic_favourite_liked);
+            }
+            if (movieDB.getMyRating() != 0) {
+                userRating.setText("My Rating " + String.format("%.1f", movieDB.getMyRating() / 2));
             }
         }
 
@@ -404,7 +421,7 @@ public class MovieActivity extends AppCompatActivity {
      */
     private void setMovieTotalRatingNumberAndVoteCount(Movie movie) {
         movieRatingNumber.setText(MovieUtils.getMovieStringRating(movie));
-        movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
+        //movieTotalVotes.setText(String.valueOf(movie.getVoteCount()));
     }
 
     /**
@@ -423,11 +440,21 @@ public class MovieActivity extends AppCompatActivity {
      * @param movie <code>Movie</code> type value of movie
      */
     private void setMovieOverview(Movie movie) {
-        if (movie.getOverview().length() > 250) {
-            movieOverview.setText(MovieUtils.getShorterOverview(movie));
-        } else {
-            movieOverview.setText(movie.getOverview());
-        }
+        movieOverview.setText(movie.getOverview());
+        movieOverview.setOnClickListener(new View.OnClickListener() {
+            boolean isClicked = true;
+
+            @Override
+            public void onClick(View v) {
+                if (isClicked) {
+                    movieOverview.setMaxLines(Integer.MAX_VALUE);
+                    isClicked = false;
+                } else {
+                    movieOverview.setMaxLines(3);
+                    isClicked = true;
+                }
+            }
+        });
     }
 
     /**
@@ -436,12 +463,7 @@ public class MovieActivity extends AppCompatActivity {
      * @param movie <code>Movie</code> type value of movie
      */
     private void setMoviePosterImage(Movie movie) {
-        if (movie.getPosterPath() == null) {
-            Picasso.with(MovieActivity.this).load(R.drawable.poster_default).into(moviePoster);
-        } else {
-            Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(target);
-            indicator.setFillColor(PosterLoader.vibrantColor());
-        }
+        Picasso.with(MovieActivity.this).load(MovieUtils.getPosterURL(Constants.POSTER_SIZE_W342, movie)).into(target);
     }
 
     /**
@@ -451,22 +473,6 @@ public class MovieActivity extends AppCompatActivity {
      */
     private void setMovieDurationAndGenre(Movie movie) {
         movieDurationAndGenre.setText(MovieUtils.getDurationAndGenre(movie));
-    }
-
-
-    /**
-     * Sets link to movie reviews or tv show info page
-     *
-     * @param movie   <code>Movie</code> type value of movie
-     * @param type    <code>int</code> type value of movie or tv show type
-     * @param movieId <code>long</code> type value of movie id or tv show id
-     */
-    private void setMovieReviewsLink(final Movie movie, final int type, final long movieId) {
-        if (type == Constants.MOVIE) {
-            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.MOVIE));
-        } else {
-            movieReviewsLink.setOnClickListener(new MovieReviewClicked(movieId, MovieActivity.this, Constants.TV_SHOWS));
-        }
     }
 
     /**
@@ -497,48 +503,69 @@ public class MovieActivity extends AppCompatActivity {
         }
     }
 
-//    /**
-//     * Sets top three cast in a parent linear layout
-//     *
-//     * @param casts    <code>List</code> of Cast objects
-//     * @param position <code>int</code> type value of position in a list
-//     */
-//    private void setTopBilledCast(List<Cast> casts, int position) {
-//        if (casts != null || casts.size() != 0) {
-//            if (position < casts.size()) {
-//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
-//                params.setMargins(13, 13, 13, 13);
-//                LinearLayout linearLayout = new LinearLayout(this);
-//                linearLayout.setLayoutParams(params);
-//                linearLayout.setOrientation(LinearLayout.VERTICAL);
-//                linearLayout.setWeightSum(4.0f);
-//
-//                ImageView castImage = new ImageView(this);
-//                castImage.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 2.6f));
-//                castImage.setScaleType(ImageView.ScaleType.FIT_XY);
-//
-//                if (casts.get(position).getProfilePath() == null) {
-//                    Picasso.with(this).load(R.drawable.profile_default).into(castImage);
-//                } else {
-//                    Picasso.with(this).load(MovieUtils.getCastImageURL(Constants.PROFILE_SIZE_W185, casts.get(position))).into(castImage);
-//                }
-//
-//                TextView castName = new TextView(this);
-//                castName.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.4f));
-//                castName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-//                castName.setText(casts.get(position).getName());
-//                castName.setMaxLines(2);
-//
-//                linearLayout.addView(castImage);
-//                linearLayout.addView(castName);
-//                linearLayout.setOnClickListener(new ActorClicked(casts.get(position), this));
-//
-//                topBilledCast.addView(linearLayout);
-//            }
-//        } else {
-//            topBilledCast.setVisibility(View.INVISIBLE);
-//        }
-//    }
+    private void setReviews(List<Review> reviews) {
+        for (Review r : reviews) {
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 6, 0, 0);
+            LinearLayout linearLayout = new LinearLayout(this);
+            linearLayout.setLayoutParams(params);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+            TextView authorName = new TextView(this);
+            authorName.setTextColor(getResources().getColor(R.color.textHighlight));
+            authorName.setTextSize(14f);
+            authorName.setText(r.getAuthor());
+
+            TextView reviewContent = new TextView(this);
+            reviewContent.setPadding(0, 10, 0, 0);
+            reviewContent.setTextColor(getResources().getColor(R.color.textLighter));
+            reviewContent.setTextSize(12f);
+            reviewContent.setText(r.getContent());
+
+            linearLayout.addView(authorName);
+            linearLayout.addView(reviewContent);
+            reviewsLayout.addView(linearLayout);
+        }
+    }
+
+    private void setBackdropsWithTrailer(final Images images, final long movieId) {
+        if (images.getBackdrops().size() == 0) {
+            defaultBackdrop.setVisibility(View.VISIBLE);
+            viewPager.setVisibility(View.GONE);
+            Picasso.with(MovieActivity.this).load(R.drawable.backdrop_default).into(defaultBackdrop);
+        } else {
+            findTrailers(images, movieId);
+        }
+    }
+
+    private void findTrailers(final Images images, final long movieId) {
+        final List<Object> objects = new ArrayList<>();
+        api.findMovieVideo(movieId, new Callback<Videos>() {
+
+            @Override
+            public void success(Videos videos, Response response) {
+                Trailer t = MovieUtils.getMovieYouTubeTrailer(videos);
+                if (t != null) {
+                    objects.add(t);
+                }
+                objects.addAll(images.getBackdrops());
+                setupPagerWithBackdrops(objects);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                objects.addAll(images.getBackdrops());
+                setupPagerWithBackdrops(objects);
+                Log.e(LOG_TAG, "Failed to load movie video", error);
+            }
+        });
+    }
+
+    private void setupPagerWithBackdrops(List<Object> objects) {
+        SlideshowPagerAdapter slideshowPagerAdapter = new SlideshowPagerAdapter(MovieActivity.this, objects, getSupportFragmentManager());
+        viewPager.setAdapter(slideshowPagerAdapter);
+        indicator.setViewPager(viewPager);
+    }
 
     @Override
     protected void onDestroy() {
